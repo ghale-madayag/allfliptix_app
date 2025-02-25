@@ -30,8 +30,8 @@ class FetchInventoryJob implements ShouldQueue
             $apiToken = env('SKYBOX_API_TOKEN');
             $authToken = env('SKYBOX_AUTH_TOKEN');
 
-            //$inventoryUrl = "https://skybox.vividseats.com/services/inventory?eventDateFrom=2025-01-01T00:00:00&eventDateTo=2030-12-31T00:00:00";
-            $inventoryUrl = "https://skybox.vividseats.com/services/inventory/";
+            $inventoryUrl = "https://skybox.vividseats.com/services/inventory?eventDateFrom=2025-01-01T00:00:00";
+            //$inventoryUrl = "https://skybox.vividseats.com/services/inventory/";
             $response = Http::withHeaders([
                 'X-Api-Token' => $authToken, 
                 'X-Application-Token' => $apiToken,
