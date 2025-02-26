@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
-class FetchtCurrentYearJob implements ShouldQueue
+class FetchtLastYearJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -30,9 +30,9 @@ class FetchtCurrentYearJob implements ShouldQueue
         try {
             $apiToken = env('SKYBOX_API_TOKEN');
             $authToken = env('SKYBOX_AUTH_TOKEN');
-            $currentYear = now()->year;
+            $lastYear = now()->subYear()->year;
 
-            $inventoryUrl = "https://skybox.vividseats.com/services/inventory?eventDateFrom={$currentYear}-01-01T00:00:00";
+            $inventoryUrl = "https://skybox.vividseats.com/services/inventory?eventDateFrom={$lastYear}-01-01T00:00:00";
             //$inventoryUrl = "https://skybox.vividseats.com/services/inventory/";
             $response = Http::withHeaders([
                 'X-Api-Token' => $authToken, 

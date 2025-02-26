@@ -14,7 +14,25 @@ class SkyboxController extends Controller
         $currentMonth = Carbon::now()->startOfMonth();
         $previousMonth = Carbon::now()->subMonth()->startOfMonth();
 
-        $inventory = Inventory::all()->map(function ($item) {
+        // Define date ranges
+        $today = Carbon::today();
+        $oneDayAgo = Carbon::yesterday();
+        $threeDaysAgo = Carbon::now()->subDays(3);
+        $sevenDaysAgo = Carbon::now()->subDays(7);
+
+        $inventory = Inventory::all()->map(function ($item) use ($oneDayAgo, $threeDaysAgo, $sevenDaysAgo, $today) {
+            $avgSold1Day = Inventory::where('event_id', $item->event_id)
+                ->whereBetween('date', [$oneDayAgo, $today])
+                ->avg('sold') ?? 0;
+    
+            $avgSold3Days = Inventory::where('event_id', $item->event_id)
+                ->whereBetween('date', [$threeDaysAgo, $today])
+                ->avg('sold') ?? 0;
+    
+            $avgSold7Days = Inventory::where('event_id', $item->event_id)
+                ->whereBetween('date', [$sevenDaysAgo, $today])
+                ->avg('sold') ?? 0;
+    
             return [
                 'event_id' => $item->event_id,
                 'name' => $item->name,
@@ -26,6 +44,9 @@ class SkyboxController extends Controller
                 'stubhub_url' => $item->stubhub_url ?? 'N/A',
                 'vivid_url' => $item->vivid_url ?? 'N/A',
                 'updated_at' => $item->updated_at,
+                'avg_sold_1d' => round($avgSold1Day, 2),
+                'avg_sold_3d' => round($avgSold3Days, 2),
+                'avg_sold_7d' => round($avgSold7Days, 2),
             ];
         })->toArray();
 
@@ -57,7 +78,7 @@ class SkyboxController extends Controller
             ? (($avgProfitMarginThisMonth - $avgProfitMarginLastMonth) / $avgProfitMarginLastMonth) * 100 
             : ($avgProfitMarginThisMonth > 0 ? 100 : 0);
         
-        //dd($avgProfitMarginThisMonth);
+        //dd($inventory);
         
         return Inertia::render('skybox/index', [
             'inventory' => $inventory,

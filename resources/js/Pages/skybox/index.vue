@@ -208,6 +208,7 @@ const renderGrid = () => {
   gridInstance = new Grid({
     columns: [
       { name: 'Event ID', hidden: true },
+      { name: "Event Name", width:'250px'},
       {
         name: "Event Date",
         width:"120px",
@@ -221,9 +222,8 @@ const renderGrid = () => {
           }).format(date);
         }
       },
-      "Event Name",
       "Venue",
-      "Quantity",
+      "Qty",
       "Sold",
       {
         name: "%Profit Margin",
@@ -243,7 +243,7 @@ const renderGrid = () => {
 
           return h('span', { className: profitClass }, [
             iconClass ? h('i', { className: iconClass }) : null,
-            ` ${cell} %`
+            ` ${cell}`
           ]);
         }
       },
@@ -251,7 +251,7 @@ const renderGrid = () => {
         id: 'actionsColumn',
         name: 'Links',
         align: 'center',
-        width: '150px',
+        width: '60px',
         formatter: (cell, row) => {
           const stubhubUrl = row.cells[7]?.data?.trim() || "";
           const vividUrl = row.cells[8]?.data?.trim() || "";
@@ -259,25 +259,27 @@ const renderGrid = () => {
           const links = [];
 
           if (stubhubUrl !== "") {
-            links.push(h('a', {
-              href: stubhubUrl,
-              className: 'badge bg-success text-uppercase text-white',
-              target: '_blank',
-              rel: 'noopener noreferrer'
-            }, 'StubHub'));
+              links.push(h('a', {
+                  href: stubhubUrl,
+                  className: 'text-success fs-5',
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                  title: 'Stubhub'
+              }, h('i', { className: 'ri-coupon-2-fill' })));
           }
 
           if (vividUrl !== "") {
-            links.push(h('a', {
-              href: vividUrl,
-              className: 'badge bg-warning text-uppercase text-dark',
-              target: '_blank',
-              rel: 'noopener noreferrer'
-            }, 'Vivid'));
+              links.push(h('a', {
+                  href: vividUrl,
+                  className: 'text-warning fs-5',
+                  target: '_blank',
+                  rel: 'noopener noreferrer',
+                  title: 'Vivid'
+              }, h('i', { className: 'ri-coupon-2-fill' })));
           }
 
-          return h('div', { className: 'd-flex gap-2' }, links);
-        },
+          return h('div', { className: 'd-flex gap-2 justify-content-left' }, links);
+      },
         sort: false
       },
       {name: "updated", hidden: true}
@@ -286,8 +288,8 @@ const renderGrid = () => {
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .map(event => [
       event.event_id,
-      event.date,    
       event.name,
+      event.date,
       event.venue,
       event.qty,
       event.sold,
@@ -295,9 +297,9 @@ const renderGrid = () => {
       event.stubhub_url?.trim() || "", // Handle empty strings
       event.vivid_url?.trim() || ""                         
     ]),
-    pagination: { limit: 20 },
+    pagination: { limit: 100 },
     search: false,
-    sort: false,
+    sort: true,
     theme: 'mermaid',
   }).render(document.getElementById("grid-table"));
 };
