@@ -80,7 +80,7 @@ export default {
               <div>
                 <p class="fw-medium text-muted mb-0">Profit Margin this month</p>
                 <h2 class="mt-4 ff-secondary fw-semibold">
-                  <count-to :duration="7000" :startVal="0" :endVal="parseInt(totalProfitMarginThisMonth)" :decimals="2"></count-to>%
+                  <count-to :duration="7000" :startVal="0" :endVal="parseFloat(totalProfitMarginThisMonth)" :decimals="2"></count-to>%
                 </h2>
                 <p class="mb-0 text-muted">
                   <BBadge class="bg-light text-success mb-0">

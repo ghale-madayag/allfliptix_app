@@ -42,7 +42,7 @@ class FetchCurrentYearInventoryJob implements ShouldQueue
         $authToken = env('SKYBOX_AUTH_TOKEN');
 
         $currentYear = now()->year;
-        $inventoryUrl = "https://skybox.vividseats.com/services/inventory?eventDateFrom={$currentYear}-01-01T00:00:00";
+        $inventoryUrl = "https://skybox.vividseats.com/services/inventory?eventDateFrom=2022-01-01T00:00:00";
 
         $response = Http::withHeaders([
             'X-Api-Token' => $authToken, 

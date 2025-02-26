@@ -56,7 +56,9 @@ class SkyboxController extends Controller
         $percentageProfitMarginChange = $avgProfitMarginLastMonth > 0 
             ? (($avgProfitMarginThisMonth - $avgProfitMarginLastMonth) / $avgProfitMarginLastMonth) * 100 
             : ($avgProfitMarginThisMonth > 0 ? 100 : 0);
-
+        
+        //dd($avgProfitMarginThisMonth);
+        
         return Inertia::render('skybox/index', [
             'inventory' => $inventory,
             'totalQtyThisMonth' => $totalQtyThisMonth,
