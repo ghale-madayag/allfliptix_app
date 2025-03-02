@@ -223,7 +223,10 @@ const renderGrid = () => {
         }
       },
       "Venue",
-      "Qty",
+      "1 day Profit",
+      "3 days Profit",
+      "7 days Profit",
+      "Listing",
       "Sold",
       {
         name: "%Profit Margin",
@@ -253,8 +256,8 @@ const renderGrid = () => {
         align: 'center',
         width: '60px',
         formatter: (cell, row) => {
-          const stubhubUrl = row.cells[7]?.data?.trim() || "";
-          const vividUrl = row.cells[8]?.data?.trim() || "";
+          const stubhubUrl = row.cells[10]?.data?.trim() || "";
+          const vividUrl = row.cells[11]?.data?.trim() || "";
 
           const links = [];
 
@@ -291,6 +294,9 @@ const renderGrid = () => {
       event.name,
       event.date,
       event.venue,
+      event.avg_sold_1d,
+      event.avg_sold_3d,
+      event.avg_sold_7d,
       event.qty,
       event.sold,
       event.profit_margin,  

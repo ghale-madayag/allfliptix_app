@@ -1,6 +1,8 @@
 <?php
 
 namespace Database\Seeders;
+
+use App\Models\User;
 use Spatie\Permission\Models\Role;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -16,5 +18,10 @@ class RoleSeeder extends Seeder
         // Ensure the roles are created only once
         Role::firstOrCreate(['name' => 'Administrator']);
         Role::firstOrCreate(['name' => 'User']);
+
+        $user = User::where('email', 'ghale.madayag@gmail.com')->first();
+        if ($user) {
+            $user->assignRole('Administrator');
+        }
     }
 }

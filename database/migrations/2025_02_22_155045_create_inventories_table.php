@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer('sold')->default(0);
             $table->integer('qty')->default(0);
             $table->decimal('profit_margin', 10, 2)->default(0);
-            $table->string('stubhub_url')->nullable(); // New column
+            $table->text('stubhub_url')->nullable(); // New column
             $table->string('vivid_url')->nullable();   // New column
             $table->timestamps();
         });

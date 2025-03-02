@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inventory;
+use App\Models\SoldTicket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,22 +22,22 @@ class SkyboxController extends Controller
         $sevenDaysAgo = Carbon::now()->subDays(7);
 
         $inventory = Inventory::all()->map(function ($item) use ($oneDayAgo, $threeDaysAgo, $sevenDaysAgo, $today) {
-            $avgSold1Day = Inventory::where('event_id', $item->event_id)
-                ->whereBetween('date', [$oneDayAgo, $today])
-                ->avg('sold') ?? 0;
-    
-            $avgSold3Days = Inventory::where('event_id', $item->event_id)
-                ->whereBetween('date', [$threeDaysAgo, $today])
-                ->avg('sold') ?? 0;
-    
-            $avgSold7Days = Inventory::where('event_id', $item->event_id)
-                ->whereBetween('date', [$sevenDaysAgo, $today])
-                ->avg('sold') ?? 0;
-    
+            $avgSold1Day = SoldTicket::where('event_id', $item->event_id)
+                ->whereBetween('invoiceDate', [$oneDayAgo, $today])
+                ->avg('profit') ?? 0;
+        
+            $avgSold3Days = SoldTicket::where('event_id', $item->event_id)
+                ->whereBetween('invoiceDate', [$threeDaysAgo, $today])
+                ->avg('profit') ?? 0;
+        
+            $avgSold7Days = SoldTicket::where('event_id', $item->event_id)
+                ->whereBetween('invoiceDate', [$sevenDaysAgo, $today])
+                ->avg('profit') ?? 0;
+        
             return [
                 'event_id' => $item->event_id,
                 'name' => $item->name,
-                'date' => $item->date,
+                'date' => $item->date, // Keep this if you still need it
                 'venue' => $item->venue ?? 'N/A',
                 'sold' => $item->sold,
                 'qty' => $item->qty,
@@ -49,6 +50,8 @@ class SkyboxController extends Controller
                 'avg_sold_7d' => round($avgSold7Days, 2),
             ];
         })->toArray();
+
+        //dd($inventory);
 
        // Calculate current and previous month totals
         $totalQtyThisMonth = Inventory::whereBetween('date', [$currentMonth, Carbon::now()->endOfMonth()])->sum('qty');

@@ -26,6 +26,112 @@ export default {
       </BCol>
     </BRow>
     <BRow>
+      <BCol xxl="3" sm="6">
+          <BCard no-body class="card-animate">
+            <BCardBody>
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="fw-medium text-muted mb-0">Last 7 Days</p>
+                  <h2 class="mt-4 ff-secondary fw-semibold">
+                    <count-to :duration="3000" :startVal="0" :endVal="parseFloat(profit7Days)" prefix="$"></count-to>
+                  </h2>
+                  <p class="mb-0 text-muted">
+                    <BBadge class="bg-light text-success mb-0">
+                      Return of Investment
+                    </BBadge>
+                  </p>
+                </div>
+                <div>
+                  <div class="avatar-sm flex-shrink-0">
+                    <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-4">
+                      <i class="ri-money-dollar-circle-fill"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </BCardBody>
+          </BCard>
+      </BCol>
+      <BCol xxl="3" sm="6">
+        <BCard no-body class="card-animate">
+          <BCardBody>
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="fw-medium text-muted mb-0">Last 30 days</p>
+                <h2 class="mt-4 ff-secondary fw-semibold">
+                  <count-to :duration="3000" :startVal="0" :endVal="parseFloat(profit30Days)" prefix="$"></count-to>
+                </h2>
+                <p class="mb-0 text-muted">
+                  <BBadge class="bg-light text-success mb-0">
+                    Return of Investment
+                  </BBadge>
+                </p>
+              </div>
+              <div>
+                <div class="avatar-sm flex-shrink-0">
+                  <span class="avatar-title bg-danger-subtle text-danger rounded-circle fs-4">
+                    <i class="ri-money-dollar-box-fill"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </BCardBody>
+        </BCard>
+      </BCol>
+      <BCol xxl="3" sm="6">
+        <BCard no-body class="card-animate">
+          <BCardBody>
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="fw-medium text-muted mb-0">Last 90 Days</p>
+                <h2 class="mt-4 ff-secondary fw-semibold">
+                  <count-to :duration="3000" :startVal="0" :endVal="parseFloat(profit90Days)" prefix="$"></count-to>
+                </h2>
+                <p class="mb-0 text-muted">
+                  <BBadge class="bg-light text-success mb-0">
+                    Return of Investment
+                  </BBadge>
+                </p>
+              </div>
+              <div>
+                <div class="avatar-sm flex-shrink-0">
+                  <span class="avatar-title bg-success-subtle text-success rounded-circle fs-4">
+                    <i class="ri-money-dollar-circle-line"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </BCardBody>
+        </BCard>
+      </BCol>
+      <BCol xxl="3" sm="6">
+        <BCard no-body class="card-animate">
+          <BCardBody>
+            <div class="d-flex justify-content-between">
+              <div>
+                <p class="fw-medium text-muted mb-0">Last 365 Days</p>
+                <h2 class="mt-4 ff-secondary fw-semibold">
+                  <count-to :duration="3000" :startVal="0" :endVal="parseFloat(profit365Days)" prefix="$"></count-to>
+                </h2>
+                <p class="mb-0 text-muted">
+                  <BBadge class="bg-light text-success mb-0">
+                    Return of Investment
+                  </BBadge>
+                </p>
+              </div>
+              <div>
+                <div class="avatar-sm flex-shrink-0">
+                  <span class="avatar-title bg-secondary-subtle text-secondary rounded-circle fs-4">
+                    <i class="ri-money-dollar-box-line"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </BCardBody>
+        </BCard>
+      </BCol>
+    </BRow>
+    <BRow>
       <BCol lg="8">
         <BCard>
           <BCardHeader class="border-0">
@@ -88,6 +194,7 @@ export default {
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import getChartColorsArray from "@/common/getChartColorsArray";
+import { CountTo } from "vue3-count-to";
 
 let props = defineProps({
     auth: Object,
@@ -96,6 +203,10 @@ let props = defineProps({
     qtyThisMonth: Object,
     soldThisMonth: Object,
     topSoldTickets: Object,
+    profit7Days: Number,
+    profit30Days: Number,
+    profit90Days: Number,
+    profit365Days: Number,
 })
 
 const getGreeting = () => {

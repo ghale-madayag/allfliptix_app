@@ -14,8 +14,8 @@ class Kernel extends ConsoleKernel
 
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->command('fetch:inventory-current')->everyFifteenMinutes();
-        $schedule->command('fetch:inventory-last-year')->daily();
+        $schedule->command('fetch:current-year')->everyFifteenMinutes();
+        $schedule->command('fetch:last-year')->daily();
     }
 
     /**
