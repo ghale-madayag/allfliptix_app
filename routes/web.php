@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\SkyboxController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\VelzonRoutesController;
@@ -64,5 +65,10 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     Route::controller(UsersController::class)->group(function () {
         Route::get('/users', 'index');
         Route::post("/user/store","store");
-    }); 
+    });
+    
+    Route::controller(EventController::class)->group(function(){
+        Route::get('/inventory/{event}', 'event');
+
+    });
 });

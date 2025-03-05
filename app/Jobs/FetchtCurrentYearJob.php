@@ -21,133 +21,99 @@ class FetchtCurrentYearJob implements ShouldQueue
 
     public function handle()
     {
-            // Prevent multiple instances from running simultaneously
+        // Prevent multiple instances from running simultaneously
         if (Cache::has('fetch_inventory_running')) {
             Log::info('FetchInventoryJob is already running. Skipping execution.');
             return;
         }
-
+    
         Cache::put('fetch_inventory_running', true, now()->addMinutes(30));
-
+    
         try {
             $apiToken = env('SKYBOX_API_TOKEN');
             $authToken = env('SKYBOX_AUTH_TOKEN');
             $currentYear = now()->year;
-
+    
             $inventoryUrl = "https://skybox.vividseats.com/services/inventory?eventDateFrom={$currentYear}-01-01T00:00:00";
-            //$inventoryUrl = "https://skybox.vividseats.com/services/inventory/";
             $response = Http::withHeaders([
                 'X-Api-Token' => $authToken, 
                 'X-Application-Token' => $apiToken,
                 'Accept' => 'application/json',
             ])->get($inventoryUrl);
-
+    
             if ($response->failed()) {
                 Log::error($apiToken);
                 return;
             }
-
+    
             $data = $response->json();
-
-            // collect($data['rows'])->chunk(500)->each(function ($chunk) use ($authToken, $apiToken) {
-            //     $inventoryData = $chunk->map(function ($item) use ($authToken, $apiToken) {
-            //         $eventId = $item['event']['id'];
-            //         $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?eventId={$eventId}";
-
-            //         $soldResponse = Http::withHeaders([
-            //             'X-Api-Token' => $authToken, 
-            //             'X-Application-Token' => $apiToken,
-            //             'Accept' => 'application/json',
-            //         ])->get($soldTicketsUrl);
-
-            //         $soldData = $soldResponse->successful() 
-            //             ? $soldResponse->json()['soldInventoryTotals']['totalQuantity'] ?? 0 
-            //             : 0;
-
-            //         $totalProfitMargin = $soldResponse->successful() 
-            //             ? $soldResponse->json()['soldInventoryTotals']['totalProfitMargin'] ?? 0 
-            //             : 0;
-
-            //         return [
-            //             'event_id' => $eventId,
-            //             'name' => $item['event']['name'],
-            //             'date' => $item['event']['date'],
-            //             'venue' => $item['event']['venue']['name'] ?? 'N/A',
-            //             'sold' => $soldData,
-            //             'qty' => $item['quantity'],
-            //             'profit_margin' => $totalProfitMargin,
-            //             'stubhub_url' => $item['event']['stubhubEventUrl'] ?? 'N/A',
-            //             'vivid_url' => $item['event']['vividSeatsEventUrl'] ?? 'N/A',
-            //             'updated_at' => now()
-            //         ];
-            //     })->toArray();
-
-            //     // **Use upsert to update or insert records**
-            //     Inventory::upsert($inventoryData, ['event_id'], [
-            //         'name', 'date', 'venue', 'sold', 'qty', 'profit_margin', 'stubhub_url', 'vivid_url'
-            //     ]);
-            // });
-
+            $eventIdsFromAPI = collect($data['rows'])->pluck('event.id')->toArray();
+    
             collect($data['rows'])->chunk(100)->each(function ($chunk) use ($authToken, $apiToken) {
-                $inventoryData = $chunk->map(function ($item) use ($authToken, $apiToken) {
+                $inventoryData = [];
+                $soldTicketsData = [];
+    
+                foreach ($chunk as $item) {
                     $eventId = $item['event']['id'];
                     $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?eventId={$eventId}";
-            
+    
                     $soldResponse = Http::withHeaders([
                         'X-Api-Token' => $authToken, 
                         'X-Application-Token' => $apiToken,
                         'Accept' => 'application/json',
                     ])->get($soldTicketsUrl);
-            
+    
                     $soldData = $soldResponse->successful() ? $soldResponse->json() : [];
-            
                     $soldQuantity = $soldData['soldInventoryTotals']['totalQuantity'] ?? 0;
                     $totalProfitMargin = $soldData['soldInventoryTotals']['totalProfitMargin'] ?? 0;
-            
-                    // New fields for SoldTicket
-                    $cost = $soldData['rows'] ?? 0;
-                    $total = $soldData['total'] ?? 0;
-                    $profit = $soldData['profit'] ?? 0;
-            
-                    // Save to Inventories
-                    $inventory = Inventory::updateOrCreate(
-                        ['event_id' => $eventId],
-                        [
-                            'name' => $item['event']['name'],
-                            'date' => $item['event']['date'],
-                            'venue' => $item['event']['venue']['name'] ?? 'N/A',
-                            'sold' => $soldQuantity,
-                            'qty' => $item['quantity'],
-                            'profit_margin' => $totalProfitMargin,
-                            'stubhub_url' => $item['event']['stubhubEventUrl'] ?? 'N/A',
-                            'vivid_url' => $item['event']['vividSeatsEventUrl'] ?? 'N/A',
-                            'updated_at' => now()
-                        ]
-                    );
-            
-                    // Save to SoldTickets
+    
+                    // Prepare inventory data
+                    $inventoryData[] = [
+                        'event_id' => $eventId,
+                        'name' => $item['event']['name'],
+                        'date' => $item['event']['date'],
+                        'venue' => $item['event']['venue']['name'] ?? 'N/A',
+                        'sold' => $soldQuantity,
+                        'qty' => $item['quantity'],
+                        'profit_margin' => $totalProfitMargin,
+                        'stubhub_url' => $item['event']['stubhubEventUrl'] ?? 'N/A',
+                        'vivid_url' => $item['event']['vividSeatsEventUrl'] ?? 'N/A',
+                        'updated_at' => now()
+                    ];
+    
+                    // Prepare sold tickets data
                     foreach ($soldData['rows'] ?? [] as $soldItem) {
-                        SoldTicket::updateOrCreate(
-                            [
-                                'event_id' => $eventId ?? 0,
-                                'invoiceId' => $soldItem['invoiceId'] ?? 0,
-                                'cost' => $soldItem['cost'] ?? 0,
-                                'total' => $soldItem['total'] ?? 0,
-                                'profit' => $soldItem['profit'] ?? 0,
-                                'roi' => $soldItem['roi'] ?? 0,
-                                'invoiceDate' => isset($soldItem['invoiceDate']) 
+                        $soldTicketsData[] = [
+                            'event_id' => $eventId,
+                            'invoiceId' => $soldItem['invoiceId'] ?? 0,
+                            'cost' => $soldItem['cost'] ?? 0,
+                            'total' => $soldItem['total'] ?? 0,
+                            'profit' => $soldItem['profit'] ?? 0,
+                            'roi' => $soldItem['roi'] ?? 0,
+                            'invoiceDate' => isset($soldItem['invoiceDate']) 
                                 ? Carbon::parse($soldItem['invoiceDate'])->format('Y-m-d H:i:s') 
                                 : now(),
-                            ],
-                            ['updated_at' => now()]
-                        );
+                            'updated_at' => now(),
+                        ];
                     }
-            
-                    return $inventory;
-                });
+                }
+    
+                // Bulk upsert for inventories
+                Inventory::upsert($inventoryData, ['event_id'], [
+                    'name', 'date', 'venue', 'sold', 'qty', 'profit_margin', 'stubhub_url', 'vivid_url', 'updated_at'
+                ]);
+    
+                // Bulk upsert for sold tickets
+                if (!empty($soldTicketsData)) {
+                    SoldTicket::upsert($soldTicketsData, ['invoiceId'], [
+                        'event_id', 'cost', 'total', 'profit', 'roi', 'invoiceDate', 'updated_at'
+                    ]);
+                }
             });
-            
-
+    
+            // Update qty to 0 for missing inventory records
+            Inventory::whereNotIn('event_id', $eventIdsFromAPI)->update(['qty' => 0]);
+    
             Log::info('FetchCurrentYearJob completed successfully.');
         } catch (\Exception $e) {
             Log::error('FetchCurrentYearJob failed: ' . $e->getMessage());
@@ -155,4 +121,5 @@ class FetchtCurrentYearJob implements ShouldQueue
             Cache::forget('fetch_inventory_running'); // Unlock job execution
         }
     }
+    
 }

@@ -37,7 +37,7 @@ export default {
                   </h2>
                   <p class="mb-0 text-muted">
                     <BBadge class="bg-light text-success mb-0">
-                      Return of Investment
+                      Profit
                     </BBadge>
                   </p>
                 </div>
@@ -63,7 +63,7 @@ export default {
                 </h2>
                 <p class="mb-0 text-muted">
                   <BBadge class="bg-light text-success mb-0">
-                    Return of Investment
+                    Profit
                   </BBadge>
                 </p>
               </div>
@@ -89,7 +89,7 @@ export default {
                 </h2>
                 <p class="mb-0 text-muted">
                   <BBadge class="bg-light text-success mb-0">
-                    Return of Investment
+                    Profit
                   </BBadge>
                 </p>
               </div>
@@ -115,7 +115,7 @@ export default {
                 </h2>
                 <p class="mb-0 text-muted">
                   <BBadge class="bg-light text-success mb-0">
-                    Return of Investment
+                    Profit
                   </BBadge>
                 </p>
               </div>

@@ -118,17 +118,17 @@ class DashboardController extends Controller
         $oneYearAgo = Carbon::now()->subDays(365);
 
         $profit7Days = SoldTicket::whereBetween('invoiceDate', [$sevenDaysAgo, Carbon::now()])
-            ->sum('roi') ?? 0;
+            ->sum('profit') ?? 0;
 
         $profit30Days = SoldTicket::whereBetween('invoiceDate', [$oneMonthAgo, Carbon::now()])
-            ->sum('roi') ?? 0;
+            ->sum('profit') ?? 0;
         
 
         $profit90Days = SoldTicket::whereBetween('invoiceDate', [$ninetyDaysAgo, Carbon::now()])
-            ->sum('roi') ?? 0;
+            ->sum('profit') ?? 0;
 
         $profit365Days = SoldTicket::whereBetween('invoiceDate', [$oneYearAgo, Carbon::now()])
-            ->sum('roi') ?? 0;
+            ->sum('profit') ?? 0;
 
         $topSoldTickets = Inventory::selectRaw('
             event_id, 

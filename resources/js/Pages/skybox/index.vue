@@ -142,6 +142,7 @@ import { defineProps, onMounted, nextTick,ref, watch, computed, watchEffect } fr
 import { CountTo } from "vue3-count-to";
 import { Grid, h } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
   inventory: Array,
@@ -208,10 +209,9 @@ const renderGrid = () => {
   gridInstance = new Grid({
     columns: [
       { name: 'Event ID', hidden: true },
-      { name: "Event Name", width:'250px'},
+      { name: "Event Name"},
       {
         name: "Event Date",
-        width:"120px",
         formatter: (cell) => {
           if (!cell) return "N/A";
           const date = new Date(cell);
@@ -223,9 +223,9 @@ const renderGrid = () => {
         }
       },
       "Venue",
-      "1 day Profit",
-      "3 days Profit",
-      "7 days Profit",
+      "1 day Avg. Sale",
+      "3 days Avg. Sale",
+      "7 days Avg. Sale",
       "Listing",
       "Sold",
       {
@@ -254,10 +254,12 @@ const renderGrid = () => {
         id: 'actionsColumn',
         name: 'Links',
         align: 'center',
-        width: '60px',
+        width: '80px',
         formatter: (cell, row) => {
           const stubhubUrl = row.cells[10]?.data?.trim() || "";
           const vividUrl = row.cells[11]?.data?.trim() || "";
+          const event_url = '/inventory/'+row.cells[0]?.data;
+          const sold = row.cells[8]?.data;
 
           const links = [];
 
@@ -281,11 +283,23 @@ const renderGrid = () => {
               }, h('i', { className: 'ri-coupon-2-fill' })));
           }
 
-          return h('div', { className: 'd-flex gap-2 justify-content-left' }, links);
+          if (sold > 0) {
+              links.push(h('a', {
+                  href: '#',
+                  className: 'text-danger fs-5',
+                  title: 'View Sold Inventory',
+                  onclick: (e) => {
+                      e.preventDefault();
+                      router.visit(event_url); // Inertia navigation without reload
+                  }
+              }, h('i', { className: 'ri-database-2-fill' })));
+          }
+
+        return h('div', { className: 'd-flex gap-2 justify-content-left' }, links);
       },
         sort: false
       },
-      {name: "updated", hidden: true}
+      {name: "updated", hidden: true},
     ],
     data: getFilteredData()
     .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -301,12 +315,13 @@ const renderGrid = () => {
       event.sold,
       event.profit_margin,  
       event.stubhub_url?.trim() || "", // Handle empty strings
-      event.vivid_url?.trim() || ""                         
+      event.vivid_url?.trim() || "",                         
     ]),
     pagination: { limit: 100 },
     search: false,
     sort: true,
     theme: 'mermaid',
+    resizable: true,
   }).render(document.getElementById("grid-table"));
 };
 
