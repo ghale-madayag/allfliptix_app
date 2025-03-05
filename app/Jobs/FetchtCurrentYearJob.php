@@ -57,11 +57,11 @@ class FetchtCurrentYearJob implements ShouldQueue
                     $eventId = $item['event']['id'];
                     $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?eventId={$eventId}";
     
-                    $soldResponse = Http::withHeaders([
+                    $soldResponse = Http::retry(3, 5000)->withHeaders([
                         'X-Api-Token' => $authToken, 
                         'X-Application-Token' => $apiToken,
                         'Accept' => 'application/json',
-                    ])->get($soldTicketsUrl);
+                    ])->timeout(60)->get($soldTicketsUrl);
     
                     $soldData = $soldResponse->successful() ? $soldResponse->json() : [];
                     $soldQuantity = $soldData['soldInventoryTotals']['totalQuantity'] ?? 0;
