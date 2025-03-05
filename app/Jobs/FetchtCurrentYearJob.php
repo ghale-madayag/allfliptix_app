@@ -49,7 +49,7 @@ class FetchtCurrentYearJob implements ShouldQueue
             $data = $response->json();
             $eventIdsFromAPI = collect($data['rows'])->pluck('event.id')->toArray();
     
-            collect($data['rows'])->chunk(100)->each(function ($chunk) use ($authToken, $apiToken) {
+            collect($data['rows'])->chunk(50)->each(function ($chunk) use ($authToken, $apiToken) {
                 $inventoryData = [];
                 $soldTicketsData = [];
     
