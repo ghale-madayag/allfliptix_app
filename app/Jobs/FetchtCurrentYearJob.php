@@ -61,7 +61,7 @@ class FetchtCurrentYearJob implements ShouldQueue
                         'X-Api-Token' => $authToken, 
                         'X-Application-Token' => $apiToken,
                         'Accept' => 'application/json',
-                    ])->timeout(60)->get($soldTicketsUrl);
+                    ])->timeout(120)->get($soldTicketsUrl);
     
                     $soldData = $soldResponse->successful() ? $soldResponse->json() : [];
                     $soldQuantity = $soldData['soldInventoryTotals']['totalQuantity'] ?? 0;
