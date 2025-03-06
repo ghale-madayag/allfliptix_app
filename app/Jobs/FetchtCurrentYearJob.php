@@ -77,54 +77,54 @@ class FetchtCurrentYearJob implements ShouldQueue
                 'name', 'date', 'venue', 'qty', 'profit_margin', 'sold', 'stubhub_url', 'vivid_url', 'updated_at'
             ]);
 
-            // STEP 2: Query saved inventory and fetch sold ticket data
-            $inventoryRecords = Inventory::whereIn('event_id', array_keys($inventoryData))->get();
-            $soldTicketsData = [];
+            // // STEP 2: Query saved inventory and fetch sold ticket data
+            // $inventoryRecords = Inventory::whereIn('event_id', array_keys($inventoryData))->get();
+            // $soldTicketsData = [];
 
-            foreach ($inventoryRecords as $inventory) {
-                $eventId = $inventory->event_id;
-                $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?eventId={$eventId}";
+            // foreach ($inventoryRecords as $inventory) {
+            //     $eventId = $inventory->event_id;
+            //     $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?eventId={$eventId}";
 
-                $soldResponse = Http::withHeaders([
-                    'X-Api-Token' => $authToken, 
-                    'X-Application-Token' => $apiToken,
-                    'Accept' => 'application/json',
-                ])->get($soldTicketsUrl);
+            //     $soldResponse = Http::withHeaders([
+            //         'X-Api-Token' => $authToken, 
+            //         'X-Application-Token' => $apiToken,
+            //         'Accept' => 'application/json',
+            //     ])->get($soldTicketsUrl);
 
-                $soldData = $soldResponse->successful() ? $soldResponse->json() : [];
-                $soldQuantity = $soldData['soldInventoryTotals']['totalQuantity'] ?? 0;
-                $totalProfitMargin = $soldData['soldInventoryTotals']['totalProfitMargin'] ?? 0;
+            //     $soldData = $soldResponse->successful() ? $soldResponse->json() : [];
+            //     $soldQuantity = $soldData['soldInventoryTotals']['totalQuantity'] ?? 0;
+            //     $totalProfitMargin = $soldData['soldInventoryTotals']['totalProfitMargin'] ?? 0;
 
-                // Update inventory record with sold quantity & profit margin
-                Inventory::where('event_id', $eventId)->update([
-                    'sold' => $soldQuantity,
-                    'profit_margin' => $totalProfitMargin,
-                    'updated_at' => now()
-                ]);
+            //     // Update inventory record with sold quantity & profit margin
+            //     Inventory::where('event_id', $eventId)->update([
+            //         'sold' => $soldQuantity,
+            //         'profit_margin' => $totalProfitMargin,
+            //         'updated_at' => now()
+            //     ]);
 
-                // Prepare sold tickets data
-                foreach ($soldData['rows'] ?? [] as $soldItem) {
-                    $soldTicketsData[] = [
-                        'event_id' => $eventId,
-                        'invoiceId' => $soldItem['invoiceId'] ?? 0,
-                        'cost' => $soldItem['cost'] ?? 0,
-                        'total' => $soldItem['total'] ?? 0,
-                        'profit' => $soldItem['profit'] ?? 0,
-                        'roi' => $soldItem['roi'] ?? 0,
-                        'invoiceDate' => isset($soldItem['invoiceDate']) 
-                            ? Carbon::parse($soldItem['invoiceDate'])->format('Y-m-d H:i:s') 
-                            : now(),
-                        'updated_at' => now(),
-                    ];
-                }
-            }
+            //     // Prepare sold tickets data
+            //     foreach ($soldData['rows'] ?? [] as $soldItem) {
+            //         $soldTicketsData[] = [
+            //             'event_id' => $eventId,
+            //             'invoiceId' => $soldItem['invoiceId'] ?? 0,
+            //             'cost' => $soldItem['cost'] ?? 0,
+            //             'total' => $soldItem['total'] ?? 0,
+            //             'profit' => $soldItem['profit'] ?? 0,
+            //             'roi' => $soldItem['roi'] ?? 0,
+            //             'invoiceDate' => isset($soldItem['invoiceDate']) 
+            //                 ? Carbon::parse($soldItem['invoiceDate'])->format('Y-m-d H:i:s') 
+            //                 : now(),
+            //             'updated_at' => now(),
+            //         ];
+            //     }
+            // }
 
-            // STEP 3: Bulk upsert for sold tickets
-            if (!empty($soldTicketsData)) {
-                SoldTicket::upsert($soldTicketsData, ['invoiceId'], [
-                    'event_id', 'cost', 'total', 'profit', 'roi', 'invoiceDate', 'updated_at'
-                ]);
-            }
+            // // STEP 3: Bulk upsert for sold tickets
+            // if (!empty($soldTicketsData)) {
+            //     SoldTicket::upsert($soldTicketsData, ['invoiceId'], [
+            //         'event_id', 'cost', 'total', 'profit', 'roi', 'invoiceDate', 'updated_at'
+            //     ]);
+            // }
 
             // STEP 4: Update qty to 0 for missing inventory records
             Inventory::whereNotIn('event_id', $eventIdsFromAPI)->update(['qty' => 0]);
