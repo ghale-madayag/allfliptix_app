@@ -24,43 +24,16 @@ export default {
           <BCardBody>
             <div class="d-flex justify-content-between">
               <div>
-                <p class="fw-medium text-muted mb-0">Total Quantity this Month</p>
-                <h2 class="mt-4 ff-secondary fw-semibold">
-                  <count-to :duration="3000" :startVal="0" :endVal="parseInt(totalQtyThisMonth)"></count-to>
-                </h2>
-                <p class="mb-0 text-muted">
-                  <BBadge class="bg-light text-success mb-0">
-                    <i class="ri-arrow-up-line align-middle"></i> {{ percentageQtyChange }} %
-                  </BBadge>
-                  vs. previous month
-                </p>
-              </div>
-              <div>
-                <div class="avatar-sm flex-shrink-0">
-                  <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-4">
-                    <i class="ri-ticket-2-fill"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </BCardBody>
-        </BCard>
-      </BCol>
-      <BCol xxl="3" sm="6">
-        <BCard no-body class="card-animate">
-          <BCardBody>
-            <div class="d-flex justify-content-between">
-              <div>
                 <p class="fw-medium text-muted mb-0">Total Sold this month</p>
                 <h2 class="mt-4 ff-secondary fw-semibold">
                   <count-to :duration="5000" :startVal="0" :endVal="parseInt(totalSoldThisMonth)"></count-to>
                 </h2>
-                <p class="mb-0 text-muted">
+                <!-- <p class="mb-0 text-muted">
                   <BBadge class="bg-light text-success mb-0">
                     <i class="ri-arrow-up-line align-middle"></i> {{ percentageSoldChange }}%
                   </BBadge>
                   vs. previous month
-                </p>
+                </p> -->
               </div>
               <div>
                 <div class="avatar-sm flex-shrink-0">
@@ -78,16 +51,43 @@ export default {
           <BCardBody>
             <div class="d-flex justify-content-between">
               <div>
+                <p class="fw-medium text-muted mb-0">Total Profit this Month</p>
+                <h2 class="mt-4 ff-secondary fw-semibold">
+                  $<count-to :duration="3000" :startVal="0" :endVal="parseFloat(totalQtyThisMonth)" :decimals="2"></count-to>
+                </h2>
+                <!-- <p class="mb-0 text-muted">
+                  <BBadge class="bg-light text-success mb-0">
+                    <i class="ri-arrow-up-line align-middle"></i> {{ percentageQtyChange }} %
+                  </BBadge>
+                  vs. previous month
+                </p> -->
+              </div>
+              <div>
+                <div class="avatar-sm flex-shrink-0">
+                  <span class="avatar-title bg-warning-subtle text-warning rounded-circle fs-4">
+                    <i class="ri-ticket-2-fill"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </BCardBody>
+        </BCard>
+      </BCol>
+      <BCol xxl="3" sm="6">
+        <BCard no-body class="card-animate">
+          <BCardBody>
+            <div class="d-flex justify-content-between">
+              <div>
                 <p class="fw-medium text-muted mb-0">Profit Margin this month</p>
                 <h2 class="mt-4 ff-secondary fw-semibold">
                   <count-to :duration="7000" :startVal="0" :endVal="parseFloat(totalProfitMarginThisMonth)" :decimals="2"></count-to>%
                 </h2>
-                <p class="mb-0 text-muted">
+                <!-- <p class="mb-0 text-muted">
                   <BBadge class="bg-light text-success mb-0">
                     <i class="ri-arrow-up-line align-middle"></i> {{ percentageProfitMarginChange }}%
                   </BBadge>
                   vs. previous month
-                </p>
+                </p> -->
               </div>
               <div>
                 <div class="avatar-sm flex-shrink-0">
@@ -149,9 +149,6 @@ const props = defineProps({
   totalQtyThisMonth: String,
   totalSoldThisMonth: String,
   totalProfitMarginThisMonth: String,
-  percentageQtyChange: Number,
-  percentageSoldChange: Number,
-  percentageProfitMarginChange: Number
 });
 
 const totalQtyThisMonth = props.totalQtyThisMonth;
@@ -226,6 +223,7 @@ const renderGrid = () => {
       "1 day Avg. Sale",
       "3 days Avg. Sale",
       "7 days Avg. Sale",
+      "30 days Avg. Sale",
       "Listing",
       "Sold",
       {
@@ -311,6 +309,7 @@ const renderGrid = () => {
       event.avg_sold_1d,
       event.avg_sold_3d,
       event.avg_sold_7d,
+      event.avg_sold_30d,
       event.qty,
       event.sold,
       event.profit_margin,  
