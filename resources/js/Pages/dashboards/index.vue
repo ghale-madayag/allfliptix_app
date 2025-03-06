@@ -332,7 +332,7 @@ const optionsSales = ref({
       intersect: false,
     },
     xaxis: {
-      categories: ["Tickets"],
+      categories: ["Tickets Sold"],
     },
     fill:{
       opacity: [0.7,0.7],
@@ -360,14 +360,14 @@ const series = ref([
 
 const seriesSales = ref([
     {
-        name: "Quantity",
-        type: 'bar',
-        data: props.qtyThisMonth
-    },
-    {
-        name: "Sold",
+        name: "Last Month",
         type: 'bar',
         data: props.soldThisMonth
+    },
+    {
+        name: "Current Month",
+        type: 'bar',
+        data: props.qtyThisMonth
     }
   ]
 );

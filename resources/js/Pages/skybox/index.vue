@@ -257,7 +257,7 @@ const renderGrid = () => {
           const stubhubUrl = row.cells[10]?.data?.trim() || "";
           const vividUrl = row.cells[11]?.data?.trim() || "";
           const event_url = '/inventory/'+row.cells[0]?.data;
-          const sold = row.cells[8]?.data;
+          const sold = row.cells[9]?.data;
 
           const links = [];
 

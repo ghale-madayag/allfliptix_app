@@ -54,6 +54,7 @@ class EventController extends Controller
             $eventDate = isset($event['date']) ? Carbon::parse($event['date'])->format('M d, Y h:i A') : 'N/A';
 
             $eventDetails = [
+                'id' => $event['id'] ?? 'N/A',
                 'name'    => $event['name'] ?? 'N/A',
                 'date'    => $eventDate,
                 'venue'    => $event['venue']['name'] ?? 'N/A',

@@ -44,6 +44,16 @@ export default {
             </div>
           </div>
         </BCol>
+        <BCol cols="12" lg="auto" order-lg="0" class="order-last">
+          <BRow class="text text-white-50 text-center">
+            <div class="d-flex profile-wrapper">
+                <div class="d-flex justify-content-end">
+                  <a target="_blank" :href='"https://skybox.vividseats.com/inventory/sold?eventId="+event_details.id' class="btn btn-success"><i
+                      class="ri-links-line align-bottom"></i> Skybox Vividseats</a>
+                </div>
+              </div>
+          </BRow>
+        </BCol>
       </BRow>
     </div>
         <BRow>

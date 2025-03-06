@@ -45,6 +45,15 @@ class FetchProfitJob implements ShouldQueue
             $periods["365d_part_$i"] = [$start, $end];
         }
 
+        // Add Monthly Data for Last Year and This Year
+        for ($year = now()->year - 1; $year <= now()->year; $year++) {
+            for ($month = 1; $month <= 12; $month++) {
+                $start = now()->setYear($year)->setMonth($month)->startOfMonth()->subDay()->setTime(16, 0, 0, 0);
+                $end = now()->setYear($year)->setMonth($month)->endOfMonth()->setTime(15, 59, 59, 999);
+                $periods["{$year}-" . str_pad($month, 2, '0', STR_PAD_LEFT)] = [$start, $end];
+            }
+        }
+
         foreach ($periods as $key => [$from, $to]) {
             $response = Http::withHeaders([
                 'X-Api-Token' => env('SKYBOX_AUTH_TOKEN'), 
@@ -72,13 +81,13 @@ class FetchProfitJob implements ShouldQueue
                         'total_qty' => $totalQuantity, 
                     ]
                 );
-                Log::info('Fetch Profit Job completed successfully.');
                 
             }else{
                 Log::error('Fetch Profit Job Error :' . $response->body());
             }
 
-            
         }
+
+        Log::info('Fetch Profit Job completed successfully.');
     }
 }
