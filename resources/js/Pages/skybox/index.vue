@@ -254,8 +254,8 @@ const renderGrid = () => {
         align: 'center',
         width: '80px',
         formatter: (cell, row) => {
-          const stubhubUrl = row.cells[10]?.data?.trim() || "";
-          const vividUrl = row.cells[11]?.data?.trim() || "";
+          const stubhubUrl = row.cells[11]?.data?.trim() || "";
+          const vividUrl = row.cells[12]?.data?.trim() || "";
           const event_url = '/inventory/'+row.cells[0]?.data;
           const sold = row.cells[9]?.data;
 
@@ -283,13 +283,10 @@ const renderGrid = () => {
 
           if (sold > 0) {
               links.push(h('a', {
-                  href: '#',
+                  href: event_url,
+                  target: '_blank',
                   className: 'text-danger fs-5',
                   title: 'View Sold Inventory',
-                  onclick: (e) => {
-                      e.preventDefault();
-                      router.visit(event_url); // Inertia navigation without reload
-                  }
               }, h('i', { className: 'ri-database-2-fill' })));
           }
 
