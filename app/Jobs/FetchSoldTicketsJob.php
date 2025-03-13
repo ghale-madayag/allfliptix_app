@@ -41,7 +41,7 @@ class FetchSoldTicketsJob implements ShouldQueue
                                 'X-Api-Token' => $authToken, 
                                 'X-Application-Token' => $apiToken,
                                 'Accept' => 'application/json',
-                            ])->timeout(60)->get($soldTicketsUrl);
+                            ])->get($soldTicketsUrl);
 
                             if ($soldResponse->failed()) {
                                 Log::warning("FetchSoldTicketsJob failed for Event ID: {$eventId}");
