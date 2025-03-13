@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -13,77 +12,80 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Inventory;
 use App\Models\SoldTicket;
 use Carbon\Carbon;
+use Exception;
 
 class FetchSoldTicketsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct()
     {
         //
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle()
     {
-        $apiToken = env('SKYBOX_API_TOKEN');
-        $authToken = env('SKYBOX_AUTH_TOKEN');
-        $soldTicketsData = [];
+        try {
+            $apiToken = env('SKYBOX_API_TOKEN');
+            $authToken = env('SKYBOX_AUTH_TOKEN');
+            $soldTicketsData = [];
 
-        $inventoryRecords = Inventory::whereYear('date', '>=', now()->subYear()->year)->get();
-        
-        foreach ($inventoryRecords as $inventory) {
-            $eventId = $inventory->event_id;
-            $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?eventId={$eventId}";
+            $inventoryRecords = Inventory::whereYear('date', '>=', now()->subYear()->year)->get();
 
-            $soldResponse = Http::withHeaders([
-                'X-Api-Token' => $authToken, 
-                'X-Application-Token' => $apiToken,
-                'Accept' => 'application/json',
-            ])->timeout(60)->get($soldTicketsUrl);
+            foreach ($inventoryRecords as $inventory) {
+                try {
+                    $eventId = $inventory->event_id;
+                    $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?eventId={$eventId}";
 
-            if ($soldResponse->failed()) {
-                Log::warning("FetchSoldTicketsJob failed for Event ID: {$eventId}");
-                continue;
+                    $soldResponse = Http::withHeaders([
+                        'X-Api-Token' => $authToken, 
+                        'X-Application-Token' => $apiToken,
+                        'Accept' => 'application/json',
+                    ])->timeout(60)->get($soldTicketsUrl);
+
+                    if ($soldResponse->failed()) {
+                        Log::warning("FetchSoldTicketsJob failed for Event ID: {$eventId}");
+                        continue;
+                    }
+
+                    $soldData = $soldResponse->json();
+                    $soldQuantity = $soldData['soldInventoryTotals']['totalQuantity'] ?? 0;
+                    $totalProfitMargin = $soldData['soldInventoryTotals']['totalProfitMargin'] ?? 0;
+
+                    Inventory::where('event_id', $eventId)->update([
+                        'sold' => $soldQuantity,
+                        'profit_margin' => $totalProfitMargin,
+                        'updated_at' => now()
+                    ]);
+
+                    foreach ($soldData['rows'] ?? [] as $soldItem) {
+                        $soldTicketsData[] = [
+                            'event_id' => $eventId,
+                            'invoiceId' => $soldItem['invoiceId'] ?? 0,
+                            'cost' => $soldItem['cost'] ?? 0,
+                            'total' => $soldItem['total'] ?? 0,
+                            'profit' => $soldItem['profit'] ?? 0,
+                            'roi' => $soldItem['roi'] ?? 0,
+                            'invoiceDate' => isset($soldItem['invoiceDate']) 
+                                ? Carbon::parse($soldItem['invoiceDate'])->format('Y-m-d H:i:s') 
+                                : now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+                } catch (Exception $e) {
+                    Log::error("Error processing Event ID {$inventory->event_id}: " . $e->getMessage());
+                }
             }
 
-            $soldData = $soldResponse->json();
-            $soldQuantity = $soldData['soldInventoryTotals']['totalQuantity'] ?? 0;
-            $totalProfitMargin = $soldData['soldInventoryTotals']['totalProfitMargin'] ?? 0;
-
-            Inventory::where('event_id', $eventId)->update([
-                'sold' => $soldQuantity,
-                'profit_margin' => $totalProfitMargin,
-                'updated_at' => now()
-            ]);
-
-            foreach ($soldData['rows'] ?? [] as $soldItem) {
-                $soldTicketsData[] = [
-                    'event_id' => $eventId,
-                    'invoiceId' => $soldItem['invoiceId'] ?? 0,
-                    'cost' => $soldItem['cost'] ?? 0,
-                    'total' => $soldItem['total'] ?? 0,
-                    'profit' => $soldItem['profit'] ?? 0,
-                    'roi' => $soldItem['roi'] ?? 0,
-                    'invoiceDate' => isset($soldItem['invoiceDate']) 
-                        ? Carbon::parse($soldItem['invoiceDate'])->format('Y-m-d H:i:s') 
-                        : now(),
-                    'updated_at' => now(),
-                ];
+            if (!empty($soldTicketsData)) {
+                SoldTicket::upsert($soldTicketsData, ['invoiceId'], [
+                    'event_id', 'cost', 'total', 'profit', 'roi', 'invoiceDate', 'updated_at'
+                ]);
             }
-        }
 
-        if (!empty($soldTicketsData)) {
-            SoldTicket::upsert($soldTicketsData, ['invoiceId'], [
-                'event_id', 'cost', 'total', 'profit', 'roi', 'invoiceDate', 'updated_at'
-            ]);
+            Log::info('FetchSoldTicketsJob completed successfully.');
+        } catch (Exception $e) {
+            Log::error("FetchSoldTicketsJob encountered an error: " . $e->getMessage());
         }
-
-        Log::info('FetchSoldTicketsJob completed successfully.');
     }
 }
