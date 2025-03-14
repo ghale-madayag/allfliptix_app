@@ -29,8 +29,8 @@ class FetchSoldTicketsJob implements ShouldQueue
             $authToken = env('SKYBOX_AUTH_TOKEN');
             $soldTicketsData = [];
 
-            $startDate = Carbon::now('America/New_York')->subDay()->endOfDay()->setTime(16, 0, 0)->format('Y-m-d\TH:i:s.000\Z');
-            $endDate = Carbon::now('America/New_York')->endOfDay()->format('Y-m-d\TH:i:s.999\Z');
+            $startDate = Carbon::now()->subDay()->format('Y-m-d');
+            $endDate = Carbon::now()->format('Y-m-d');
             $soldTicketsUrl = "https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom={$startDate}&invoiceDateTo={$endDate}";
 
             $soldResponse = Http::withHeaders([
