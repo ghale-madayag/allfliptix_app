@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 use App\Models\Inventory;
 use App\Models\SoldTicket;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Exception;
 
 class FetchSoldTicketsJob implements ShouldQueue
@@ -26,13 +25,6 @@ class FetchSoldTicketsJob implements ShouldQueue
 
     public function handle()
     {
-        if (Cache::has('fetch_sold_tickets')) {
-            Log::info('FetchSoldTickets is already running. Skipping execution.');
-            return;
-        }
-
-        Cache::put('fetch_sold_tickets', true, now()->addMinutes(5));
-
         try {
             $today = Carbon::today();
             $oneDayAgo = $today->copy()->subDay();
@@ -157,8 +149,6 @@ class FetchSoldTicketsJob implements ShouldQueue
 
         } catch (Exception $e) {
             Log::error("FetchSoldTicketsJob encountered an error: " . $e->getMessage());
-        }finally {
-            Cache::forget('fetch_sold_tickets');
         }
             //throw $th;
         // try {
