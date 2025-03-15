@@ -144,6 +144,8 @@ class FetchSoldTicketsJob implements ShouldQueue
                         ]
                     );
                     Log::info('Inventory table updated successfully.');
+                }else{
+                    Log::info('Inventory table not updated.');
                 }
 
 
