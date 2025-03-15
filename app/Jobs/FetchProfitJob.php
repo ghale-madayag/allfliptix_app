@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use App\Models\SoldInventoryTotal;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Exception;
 
 class FetchProfitJob implements ShouldQueue
@@ -23,6 +24,13 @@ class FetchProfitJob implements ShouldQueue
 
     public function handle()
     {
+        if (Cache::has('fetch_profit_job')) {
+            Log::info('FetchProfitJob is already running. Skipping execution.');
+            return;
+        }
+
+        Cache::put('fetch_profit_job', true, now()->addMinutes(5));
+
         try {
             $periods = [
                 '7d'   => [now()->subDays(8)->setTime(16, 0, 0, 0), now()->setTime(15, 59, 59, 999)],
@@ -84,6 +92,8 @@ class FetchProfitJob implements ShouldQueue
             Log::info('FetchProfitJob completed successfully.');
         } catch (Exception $e) {
             Log::error("FetchProfitJob encountered an error: " . $e->getMessage());
+        }finally {
+            Cache::forget('fetch_profit_job');
         }
     }
 }
