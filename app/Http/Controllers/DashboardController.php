@@ -8,6 +8,7 @@ use App\Models\SoldTicket;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
@@ -43,6 +44,16 @@ class DashboardController extends Controller
         // foreach ($profitLastYear as $month => $value) {
         //     $dataLastYear[$month - 1] = round($value, 2);
         // }
+
+        // Run the job synchronously
+        try {
+            \App\Jobs\FetchtCurrentYearJob::dispatchSync();
+            \App\Jobs\FetchtLastYearJob::dispatchSync();
+            \App\Jobs\FetchProfitJob::dispatchSync();
+        } catch (\Exception $e) {
+            Log::error("Fetch encountered an error: " . $e->getMessage());
+            // Handle the error as needed
+        }
 
         $currentYear = now()->year;
         $lastYear = now()->year - 1;

@@ -8,7 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class Inventory extends Model
 {
     use HasFactory;
-    protected $fillable = ['event_id', 'name', 'date', 'venue', 'sold', 'qty', 'profit_margin','stubhub_url','vivid_url'];
+    protected $fillable = [
+        'event_id', 
+        'name', 
+        'date', 
+        'venue',
+        'avg_profit_1d',
+        'avg_profit_3d',
+        'avg_profit_7d',
+        'avg_profit_30d', 
+        'sold', 
+        'qty', 
+        'profit_margin',
+        'stubhub_url',
+        'vivid_url'
+    ];
 
     public function soldTickets()
     {

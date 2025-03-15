@@ -13,6 +13,10 @@ class SoldTicket extends Model
         'id', // Foreign key
         'invoiceId',
         'event_id',     // Make sure to include this
+        'customerDisplayName',
+        'lowSeat',
+        'highSeat',
+        'section',
         'cost',
         'total',
         'profit',
