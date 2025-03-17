@@ -37,10 +37,11 @@ class FetchSoldTicketsJob implements ShouldQueue
             $apiToken = env('SKYBOX_API_TOKEN');
             $authToken = env('SKYBOX_AUTH_TOKEN');
 
-            Log::info('Start syncing the data');
+            
 
             // Fetch data from the external API
             $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
+            Log::info('Start syncing the data '. $url);
             $response = Http::withHeaders([
                 'X-Api-Token' => $authToken, 
                 'X-Application-Token' => $apiToken,
@@ -57,8 +58,6 @@ class FetchSoldTicketsJob implements ShouldQueue
 
             // Process and aggregate the data
             $events = [];
-
-            Log::info($data);
 
             foreach ($data['rows'] as $item) {
                 $eventId = $item['eventId'];
@@ -133,6 +132,7 @@ class FetchSoldTicketsJob implements ShouldQueue
             $totalProfitMarginThisMonth = $totalQtyThisMonth > 0 ? $totalProfitThisMonth / $totalQtyThisMonth : 0;
 
             Log::info($inventory);
+
             if (!empty($inventory)) {
                 Inventory::upsert($upsertData, ['event_id'], 
                     [
