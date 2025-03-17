@@ -9,8 +9,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Inventory;
-use App\Models\SoldTicket;
 use Carbon\Carbon;
 use Exception;
 
@@ -25,8 +25,17 @@ class FetchSoldTicketsJob implements ShouldQueue
 
     public function handle()
     {
-        
         try {
+            $cacheKey = 'sold_tickets_data';
+            $cacheDuration = 300; // 5 minutes (300 seconds)
+
+            // Check if cached data exists
+            if (Cache::has($cacheKey)) {
+                Log::info('Using cached data for sold tickets.');
+                return;
+            }
+
+            // Fetch from API if not cached
             $today = Carbon::today();
             $oneDayAgo = $today->copy()->subDay();
             $threeDaysAgo = $today->copy()->subDays(3);
@@ -37,7 +46,6 @@ class FetchSoldTicketsJob implements ShouldQueue
             $apiToken = env('SKYBOX_API_TOKEN');
             $authToken = env('SKYBOX_AUTH_TOKEN');
 
-            // Fetch data from the external API
             $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
             
             $response = Http::withHeaders([
@@ -46,23 +54,19 @@ class FetchSoldTicketsJob implements ShouldQueue
                 'Accept' => 'application/json',
             ])->get($url);
 
-            Log::info('Start syncing the data ');
+            Log::info('Fetching new data from API.');
 
             if ($response->failed()) {
-                // Handle error
-                return response()->json(['error' => 'Failed to fetch data from API'], 500);
-                Log::error(response()->json(['error' => 'Failed to fetch data from API'], 500));
+                Log::error('Failed to fetch data from API');
+                return;
             }
 
             $data = $response->json();
-
-            // Process and aggregate the data
             $events = [];
 
             foreach ($data['rows'] as $item) {
                 $eventId = $item['eventId'];
                 $quantity = $item['quantity'];
-                
                 $profit = $item['profitMargin'];
                 $invoiceDate = Carbon::parse($item['invoiceDate']);
 
@@ -86,7 +90,6 @@ class FetchSoldTicketsJob implements ShouldQueue
                 }
 
                 $events[$eventId]['sold'] += $quantity;
-                //get the profit margin
                 $totalCom = $item['total'];
                 $profitCom = $item['profit'];
 
@@ -94,10 +97,9 @@ class FetchSoldTicketsJob implements ShouldQueue
                 $events[$eventId]['profit'] += $profitCom;
 
                 $events[$eventId]['profit_margin'] = ($events[$eventId]['total'] > 0) 
-                ? ($events[$eventId]['profit'] / $events[$eventId]['total']) * 100 
-                : 0;
+                    ? ($events[$eventId]['profit'] / $events[$eventId]['total']) * 100 
+                    : 0;
 
-                // Categorize profits based on date ranges
                 if ($invoiceDate->between($oneDayAgo, $today)) {
                     $events[$eventId]['profits']['1d'][] = $profit;
                 }
@@ -113,12 +115,11 @@ class FetchSoldTicketsJob implements ShouldQueue
             }
 
             $upsertData = [];
-            // Calculate average profits
             foreach ($events as &$event) {
                 foreach ($event['profits'] as $key => $profits) {
                     $event['avg_sold_' . $key] = !empty($profits) ? round(array_sum($profits) / count($profits), 2) : 0;
                 }
-                unset($event['profits']); // Remove intermediate profits array
+                unset($event['profits']);
 
                 $upsertData[] = [
                     'event_id' => $event['event_id'],
@@ -127,46 +128,28 @@ class FetchSoldTicketsJob implements ShouldQueue
                     'venue' => $event['venue'],
                     'sold' => $event['sold'],
                     'qty' => $event['sold'],
-                    'profit_margin' => round($event['profit_margin'],2),
+                    'profit_margin' => round($event['profit_margin'], 2),
                     'avg_profit_1d' => $event['avg_sold_1d'],
                     'avg_profit_3d' => $event['avg_sold_3d'],
                     'avg_profit_7d' => $event['avg_sold_7d'],
-                    'avg_profit_30d' =>  $event['avg_sold_30d'],
+                    'avg_profit_30d' => $event['avg_sold_30d'],
                 ];
             }
 
-            // Convert associative array to indexed array
-            $inventory = array_values($events);
-
-            // Calculate summary statistics for the current month
-            $totalQtyThisMonth = array_sum(array_column($inventory, 'sold'));
-            $totalProfitThisMonth = array_sum(array_column($inventory, 'profit_margin'));
-            $totalProfitMarginThisMonth = $totalQtyThisMonth > 0 ? $totalProfitThisMonth / $totalQtyThisMonth : 0;
-
-            if (!empty($inventory)) {
-
-                Inventory::upsert($upsertData, ['event_id'], 
-                    [
-                        'name',
-                        'date',
-                        'venue',
-                        'sold',
-                        'qty',
-                        'profit_margin',
-                        'avg_profit_1d',
-                        'avg_profit_3d',
-                        'avg_profit_7d',
-                        'avg_profit_30d'
-                    ]
-                );
+            if (!empty($upsertData)) {
+                Inventory::upsert($upsertData, ['event_id'], [
+                    'name', 'date', 'venue', 'sold', 'qty', 'profit_margin',
+                    'avg_profit_1d', 'avg_profit_3d', 'avg_profit_7d', 'avg_profit_30d'
+                ]);
                 Log::info('Inventory table updated successfully.');
             }
 
+            // Cache data for 5 minutes
+            Cache::put($cacheKey, $upsertData, $cacheDuration);
+            Log::info('Cached new data for 5 minutes.');
 
         } catch (Exception $e) {
             Log::error("FetchSoldTicketsJob encountered an error: " . $e->getMessage());
         }
-            //throw $th;
-        
     }
 }
