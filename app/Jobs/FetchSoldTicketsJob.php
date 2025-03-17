@@ -50,6 +50,7 @@ class FetchSoldTicketsJob implements ShouldQueue
             if ($response->failed()) {
                 // Handle error
                 return response()->json(['error' => 'Failed to fetch data from API'], 500);
+                Log::error(response()->json(['error' => 'Failed to fetch data from API'], 500));
             }
 
             $data = $response->json();
@@ -98,8 +99,6 @@ class FetchSoldTicketsJob implements ShouldQueue
                 }
             }
 
-            //Log::info($events);
-
             $upsertData = [];
             // Calculate average profits
             foreach ($events as &$event) {
@@ -131,23 +130,24 @@ class FetchSoldTicketsJob implements ShouldQueue
             $totalProfitThisMonth = array_sum(array_column($inventory, 'profit_margin'));
             $totalProfitMarginThisMonth = $totalQtyThisMonth > 0 ? $totalProfitThisMonth / $totalQtyThisMonth : 0;
 
-                if (!empty($inventory)) {
-                    Inventory::upsert($upsertData, ['event_id'], 
-                        [
-                            'name',
-                            'date',
-                            'venue',
-                            'sold',
-                            'qty',
-                            'profit_margin',
-                            'avg_profit_1d',
-                            'avg_profit_3d',
-                            'avg_profit_7d',
-                            'avg_profit_30d'
-                        ]
-                    );
-                    Log::info('Inventory table updated successfully.');
-                }
+            Log::info($inventory);
+            if (!empty($inventory)) {
+                Inventory::upsert($upsertData, ['event_id'], 
+                    [
+                        'name',
+                        'date',
+                        'venue',
+                        'sold',
+                        'qty',
+                        'profit_margin',
+                        'avg_profit_1d',
+                        'avg_profit_3d',
+                        'avg_profit_7d',
+                        'avg_profit_30d'
+                    ]
+                );
+                Log::info('Inventory table updated successfully.');
+            }
 
 
             } catch (Exception $e) {
