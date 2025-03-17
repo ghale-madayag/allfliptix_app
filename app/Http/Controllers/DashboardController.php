@@ -86,13 +86,40 @@ class DashboardController extends Controller
         ->get();
 
         //compare high sales
-
-        $ticketCounts = DB::table('sold_tickets')
-        ->select('customerDisplayName', DB::raw('COUNT(*) as count'))
-        ->whereNotNull('customerDisplayName')
-        ->orderByDesc('count')
-        ->groupBy('customerDisplayName')
-        ->get();
+        $apiToken = env('SKYBOX_API_TOKEN');
+        $authToken = env('SKYBOX_AUTH_TOKEN');
+        $startYear = Carbon::now()->startOfYear();
+        $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
+    
+        $response = Http::withHeaders([
+            'X-Api-Token' => $authToken, 
+            'X-Application-Token' => $apiToken,
+            'Accept' => 'application/json',
+        ])->get($url);
+    
+        Log::info('Fetching new data from API.');
+    
+        if ($response->failed()) {
+            Log::error('Failed to fetch data from API');
+            return;
+        }
+    
+        $data = $response->json();
+        $customerCounts = [];
+    
+        foreach ($data['rows'] as $item) {
+            $customer = $item['customerDisplayName'] ?? null;
+            if ($customer) { // Ignore null values
+                $customerCounts[$customer] = ($customerCounts[$customer] ?? 0) + 1;
+            }
+        }
+    
+        // Convert associative array to sorted collection
+        $ticketCounts = collect($customerCounts)
+            ->map(fn($count, $name) => ['customerDisplayName' => $name, 'count' => $count])
+            ->sortByDesc('count') // Sort from highest to lowest
+            ->values()
+            ->all();
 
 
         return Inertia::render('dashboards/index', [
