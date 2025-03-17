@@ -58,6 +58,8 @@ class FetchSoldTicketsJob implements ShouldQueue
             // Process and aggregate the data
             $events = [];
 
+            Log::info($data);
+
             foreach ($data['rows'] as $item) {
                 $eventId = $item['eventId'];
                 $quantity = $item['quantity'];
