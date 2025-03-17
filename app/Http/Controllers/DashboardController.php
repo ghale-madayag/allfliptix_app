@@ -7,6 +7,7 @@ use App\Models\SoldInventoryTotal;
 use App\Models\SoldTicket;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -16,44 +17,7 @@ class DashboardController extends Controller
     
     public function index()
     {
-        // $currentYear = Carbon::now()->year;
-        // $lastYear = Carbon::now()->subYear()->year;
-        // $currentMonth = Carbon::now()->month;
-
-        // $profitThisYear = Inventory::selectRaw('MONTH(date) as month, 
-        //     SUM(profit_margin) / COUNT(event_id) as total_profit_margin')
-        //     ->whereYear('date',  $currentYear)
-        //     ->groupBy('month')
-        //     ->orderBy('month')
-        //     ->pluck('total_profit_margin', 'month');
-
-        // $profitLastYear = Inventory::selectRaw('MONTH(date) as month, 
-        //     SUM(profit_margin) / COUNT(event_id) as total_profit_margin')
-        //     ->whereYear('date', $lastYear)
-        //     ->groupBy('month')
-        //     ->orderBy('month')
-        //     ->pluck('total_profit_margin', 'month');
-
-        // $dataThisYear = array_fill(0, 12, 0);
-        // $dataLastYear = array_fill(0, 12, 0);
-
-        // foreach ($profitThisYear as $month => $value) {
-        //     $dataThisYear[$month - 1] = round($value, 2);
-        // }
-
-        // foreach ($profitLastYear as $month => $value) {
-        //     $dataLastYear[$month - 1] = round($value, 2);
-        // }
-
-        // Run the job synchronously
-        try {
-            \App\Jobs\FetchtCurrentYearJob::dispatchSync();
-            \App\Jobs\FetchtLastYearJob::dispatchSync();
-            \App\Jobs\FetchProfitJob::dispatchSync();
-        } catch (\Exception $e) {
-            Log::error("Fetch encountered an error: " . $e->getMessage());
-            // Handle the error as needed
-        }
+        
 
         $currentYear = now()->year;
         $lastYear = now()->year - 1;
@@ -121,6 +85,16 @@ class DashboardController extends Controller
         ->limit(5) // Get top 5 sold tickets
         ->get();
 
+        //compare high sales
+
+        $ticketCounts = DB::table('sold_tickets')
+        ->select('customerDisplayName', DB::raw('COUNT(*) as count'))
+        ->whereNotNull('customerDisplayName')
+        ->orderByDesc('count')
+        ->groupBy('customerDisplayName')
+        ->get();
+
+
         return Inertia::render('dashboards/index', [
             'profitThisYear' => $formattedProfits['profitThisYear'],
             'profitLastYear' => $formattedProfits['profitLastYear'],
@@ -130,7 +104,8 @@ class DashboardController extends Controller
             'profit30Days' => $sold30Days['total_profit'],
             'profit90Days' =>  $sold90Days['total_profit'],
             'profit365Days' =>  $sold365DaysTotal,
-            'topSoldTickets' => $topSoldTickets
+            'topSoldTickets' => $topSoldTickets,
+            'ticketCounts' => $ticketCounts
         ]);
     }
 

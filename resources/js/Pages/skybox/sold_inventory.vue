@@ -174,6 +174,9 @@ const renderGrid = () => {
         },
         "Qty",
         "In-Hand Date",
+        "Section",
+        "Row",
+        "Seats",
         "Unit Cost",
         "Total Cost",
         "Total",
@@ -187,6 +190,9 @@ const renderGrid = () => {
         event.invoiceDate,
         event.quantity,
         event.inHandDate,
+        event.section,
+        event.row,
+        event.lowSeat+"-"+ event.highSeat,
         '$'+event.unitCostAverage,
         '$'+event.cost,
         '$'+event.total,
@@ -200,6 +206,7 @@ const renderGrid = () => {
       search: false,
       sort: true,
       theme: 'mermaid',
+      resizable: true,
     }).render(document.getElementById("grid-table"));
   });
 };

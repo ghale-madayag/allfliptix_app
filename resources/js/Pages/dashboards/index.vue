@@ -145,7 +145,15 @@ export default {
         </BCard>
       </BCol>
       <BCol lg="4">
-        <BRow>
+       <BRow>
+          <BCard no-body>
+            <BCardHeader class="border-0">
+              <BCardTitle class="mb-0 flex-grow-1">Top Market Sales</BCardTitle>
+            </BCardHeader>
+            <BCardBody class="border border-dashed border-end-0 border-start-0">
+              <apexchart class="apex-charts" type="donut" :options="pieOptions" :series="pieSeries"></apexchart>
+            </BCardBody>
+          </BCard>
           <BCard no-body>
             <BCardHeader class="border-0">
               <BCardTitle class="mb-0 flex-grow-1">This Month Sales Forecast</BCardTitle>
@@ -154,8 +162,6 @@ export default {
               <apexchart class="apex-charts" type="bar" :options="optionsSales" :series="seriesSales"></apexchart>
             </BCardBody>
           </BCard>
-        </BRow>
-       <BRow>
         <BCard no-body>
           <BCardHeader class="border-0">
             <BCardTitle class="mb-0 flex-grow-1">Top Events This Year</BCardTitle>
@@ -207,6 +213,7 @@ let props = defineProps({
     profit30Days: Number,
     profit90Days: Number,
     profit365Days: Number,
+    ticketCounts: Object
 })
 
 const getGreeting = () => {
@@ -220,6 +227,8 @@ const getGreeting = () => {
         return 'Good evening!';
     }
 };
+
+const ticketCounts = props.ticketCounts || [];
 
 const greeting = computed(() => getGreeting());
 
@@ -371,4 +380,35 @@ const seriesSales = ref([
     }
   ]
 );
+
+const pieSeries = computed(() => ticketCounts.map(item => item.count));
+
+const pieOptions = ref({
+  chart: {
+    type: 'donut',
+  },                                      
+  labels: ticketCounts.map(item => item.customerDisplayName),
+  dataLabels: {
+    enabled: true // Hide labels on the chart
+  },
+  legend: {
+    show: true, // Hide legend,
+    position: 'right',
+    labels: {
+      useSeriesColors: true
+    },
+    formatter: function(seriesName, opts) {
+      return `${seriesName}: ${opts.w.globals.series[opts.seriesIndex]}`; // Show name and value
+    }
+  },
+  plotOptions: {
+    pie: {
+      expandOnClick: true, // Prevent slices from expanding when clicked
+      donut: {
+        size: '0%' // Adjust the fill scale (default is 65%)
+      }
+    }
+  }
+});
+
 </script>
