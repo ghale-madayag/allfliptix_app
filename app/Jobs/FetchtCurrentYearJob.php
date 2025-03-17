@@ -74,7 +74,7 @@ class FetchtCurrentYearJob implements ShouldQueue
             }
 
             Inventory::upsert($inventoryData, ['event_id'], [
-                'name', 'date', 'venue', 'qty', 'profit_margin', 'sold', 'stubhub_url', 'vivid_url', 'updated_at'
+                'name', 'date', 'venue', 'qty', 'stubhub_url', 'vivid_url', 'updated_at'
             ]);
 
             // // STEP 2: Query saved inventory and fetch sold ticket data
