@@ -46,7 +46,7 @@ class FetchSoldTicketsJob implements ShouldQueue
                 'Accept' => 'application/json',
             ])->get($url);
 
-            Log::info('Start syncing the data '. $response);
+            Log::info('Start syncing the data ');
 
             if ($response->failed()) {
                 // Handle error
