@@ -131,8 +131,6 @@ class FetchSoldTicketsJob implements ShouldQueue
             $totalProfitThisMonth = array_sum(array_column($inventory, 'profit_margin'));
             $totalProfitMarginThisMonth = $totalQtyThisMonth > 0 ? $totalProfitThisMonth / $totalQtyThisMonth : 0;
 
-            Log::info($inventory);
-
             if (!empty($inventory)) {
                 Inventory::upsert($upsertData, ['event_id'], 
                     [
