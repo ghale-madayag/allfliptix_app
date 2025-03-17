@@ -25,6 +25,7 @@ class FetchSoldTicketsJob implements ShouldQueue
 
     public function handle()
     {
+        
         try {
             $today = Carbon::today();
             $oneDayAgo = $today->copy()->subDay();
@@ -35,6 +36,8 @@ class FetchSoldTicketsJob implements ShouldQueue
 
             $apiToken = env('SKYBOX_API_TOKEN');
             $authToken = env('SKYBOX_AUTH_TOKEN');
+
+            Log::info('Start syncing the data');
 
             // Fetch data from the external API
             $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
@@ -144,14 +147,12 @@ class FetchSoldTicketsJob implements ShouldQueue
                         ]
                     );
                     Log::info('Inventory table updated successfully.');
-                }else{
-                    Log::info('Inventory table not updated.');
                 }
 
 
-        } catch (Exception $e) {
-            Log::error("FetchSoldTicketsJob encountered an error: " . $e->getMessage());
-        }
+            } catch (Exception $e) {
+                Log::error("FetchSoldTicketsJob encountered an error: " . $e->getMessage());
+            }
             //throw $th;
         // try {
         //     $apiToken = env('SKYBOX_API_TOKEN');
