@@ -37,11 +37,11 @@ class FetchSoldTicketsJob implements ShouldQueue
             $apiToken = env('SKYBOX_API_TOKEN');
             $authToken = env('SKYBOX_AUTH_TOKEN');
 
-            
-
             // Fetch data from the external API
             $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
-            Log::info('Start syncing the data '. $url);
+            
+            Log::info('Start syncing the datas '. $url);
+            
             $response = Http::withHeaders([
                 'X-Api-Token' => $authToken, 
                 'X-Application-Token' => $apiToken,
