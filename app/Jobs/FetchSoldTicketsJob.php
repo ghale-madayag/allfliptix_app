@@ -67,6 +67,7 @@ class FetchSoldTicketsJob implements ShouldQueue
             foreach ($data['rows'] as $item) {
                 $eventId = $item['eventId'];
                 $quantity = $item['quantity'];
+                $unitCostAverage = $item['unitCostAverage'];
                 $profit = $item['profitMargin'];
                 $invoiceDate = Carbon::parse($item['invoiceDate']);
 
@@ -78,6 +79,7 @@ class FetchSoldTicketsJob implements ShouldQueue
                         'venue' => $item['event']['venue']['name'] ?? 'N/A',
                         'sold' => 0,
                         'profit_margin' => 0,
+                        'unitCostAverage' => 0,  
                         'total' => 0,
                         'profit' => 0,
                         'profits' => [
@@ -90,6 +92,7 @@ class FetchSoldTicketsJob implements ShouldQueue
                 }
 
                 $events[$eventId]['sold'] += $quantity;
+                $events[$eventId]['unitCostAverage'] += $unitCostAverage;
                 $totalCom = $item['total'];
                 $profitCom = $item['profit'];
 
@@ -128,6 +131,7 @@ class FetchSoldTicketsJob implements ShouldQueue
                     'venue' => $event['venue'],
                     'sold' => $event['sold'],
                     'qty' => $event['sold'],
+                    'unit_cost'=> $event['unitCostAverage'],
                     'profit_margin' => round($event['profit_margin'], 2),
                     'avg_profit_1d' => $event['avg_sold_1d'],
                     'avg_profit_3d' => $event['avg_sold_3d'],
@@ -138,7 +142,7 @@ class FetchSoldTicketsJob implements ShouldQueue
 
             if (!empty($upsertData)) {
                 Inventory::upsert($upsertData, ['event_id'], [
-                    'name', 'date', 'venue', 'sold', 'qty', 'profit_margin',
+                    'name', 'date', 'venue', 'sold', 'qty', 'unit_cost','profit_margin',
                     'avg_profit_1d', 'avg_profit_3d', 'avg_profit_7d', 'avg_profit_30d'
                 ]);
                 Log::info('Inventory table updated successfully.');

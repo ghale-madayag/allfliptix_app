@@ -32,6 +32,7 @@ class SkyboxController extends Controller
                 'venue' => $item->venue ?? 'N/A',
                 'sold' => $item->sold,
                 'qty' => $item->qty,
+                'unit_cost' =>$item->unit_cost,
                 'profit_margin' => $item->profit_margin,
                 'stubhub_url' => $item->stubhub_url ?? 'N/A',
                 'vivid_url' => $item->vivid_url ?? 'N/A',

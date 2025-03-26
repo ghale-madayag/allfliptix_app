@@ -19,6 +19,7 @@ class Inventory extends Model
         'avg_profit_30d', 
         'sold', 
         'qty', 
+        'unit_cost',
         'profit_margin',
         'stubhub_url',
         'vivid_url'

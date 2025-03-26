@@ -224,6 +224,7 @@ const renderGrid = () => {
       "3 days Avg. Sale",
       "7 days Avg. Sale",
       "30 days Avg. Sale",
+      "Unit Cost",
       "Listing",
       "Sold",
       {
@@ -254,14 +255,14 @@ const renderGrid = () => {
         align: 'center',
         width: '80px',
         formatter: (cell, row) => {
-          const stubhubUrl = row.cells[11]?.data?.trim() || "";
-          const vividUrl = row.cells[12]?.data?.trim() || "";
+          const stubhubUrl = row.cells[12]?.data?.trim() || "";
+          const vividUrl = row.cells[13]?.data?.trim() || "";
           const event_url = '/inventory/'+row.cells[0]?.data;
-          const sold = row.cells[9]?.data;
+          const sold = row.cells[10]?.data;
 
           const links = [];
 
-          if (stubhubUrl !== "") {
+          if (stubhubUrl !== "" && stubhubUrl !== 'N/A') {
               links.push(h('a', {
                   href: stubhubUrl,
                   className: 'text-success fs-5',
@@ -271,7 +272,7 @@ const renderGrid = () => {
               }, h('i', { className: 'ri-coupon-2-fill' })));
           }
 
-          if (vividUrl !== "") {
+          if (vividUrl !== "" && vividUrl !== 'N/A') {
               links.push(h('a', {
                   href: vividUrl,
                   className: 'text-warning fs-5',
@@ -307,6 +308,7 @@ const renderGrid = () => {
       event.avg_sold_3d,
       event.avg_sold_7d,
       event.avg_sold_30d,
+      event.unit_cost,
       event.qty,
       event.sold,
       event.profit_margin,  
