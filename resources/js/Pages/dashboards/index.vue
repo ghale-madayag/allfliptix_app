@@ -24,7 +24,7 @@ export default {
           </div><!-- end card header -->
       </BCol>
     </BRow>
-    <BRow>
+    <!-- <BRow>
       <BCol xxl="3" sm="6">
           <BCard no-body class="card-animate">
             <BCardBody>
@@ -192,7 +192,7 @@ export default {
         </BCard>
       </BRow>
       </BCol>
-    </BRow>
+    </BRow> -->
   </Layout>
 </template>
 
