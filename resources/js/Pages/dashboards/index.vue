@@ -18,7 +18,7 @@ export default {
       <BCol lg="12" class="mb-4">
         <div class="d-flex align-items-lg-center flex-lg-row flex-column">
               <div class="flex-grow-1">
-                  <h4 class="fs-16 mb-1">{{ greeting }}, {{ auth.user.name }}</h4>
+                  <!-- <h4 class="fs-16 mb-1">{{ greeting }}, {{ auth.user.name }}</h4> -->
                   <p class="text-muted mb-0">Here's what's happening with your system today.</p>
               </div>
           </div><!-- end card header -->
