@@ -121,7 +121,8 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-
+        dd($ticketCounts);
+        
         return Inertia::render('dashboards/index', [
             'profitThisYear' => $formattedProfits['profitThisYear'],
             'profitLastYear' => $formattedProfits['profitLastYear'],
