@@ -166,22 +166,22 @@ class DashboardController extends Controller
         //     $formattedProfits['profitLastYear'][$monthIndex] = $profit;
         // }
 
-        // $currentMonth = now()->format('Y-m'); // Format: YYYY-MM (e.g., 2025-03)
-        // $lastMonth = now()->subMonth()->format('Y-m'); // Last month in YYYY-MM format
+        $currentMonth = now()->format('Y-m'); // Format: YYYY-MM (e.g., 2025-03)
+        $lastMonth = now()->subMonth()->format('Y-m'); // Last month in YYYY-MM format
         
         // // Get total quantity for the current month
-        // $currentMonthQty = SoldInventoryTotal::where('period', $currentMonth)
-        //     ->sum('total_qty');
+        $currentMonthQty = SoldInventoryTotal::where('period', $currentMonth)
+            ->sum('total_qty');
         
         // // Get total quantity for the last month
-        // $lastMonthQty = SoldInventoryTotal::where('period', $lastMonth)
-        //     ->sum('total_qty');
+        $lastMonthQty = SoldInventoryTotal::where('period', $lastMonth)
+         ->sum('total_qty');
         
-        // // Output result
-        // $monthlyQty = [
-        //     'currentMonthQty' => $currentMonthQty,
-        //     'lastMonthQty' => $lastMonthQty,
-        // ];
+        // Output result
+        $monthlyQty = [
+            'currentMonthQty' => $currentMonthQty,
+            'lastMonthQty' => $lastMonthQty,
+        ];
 
 
         // $sold7Days = SoldInventoryTotal::where('period', '7d')->first();
@@ -241,9 +241,9 @@ class DashboardController extends Controller
 
         return Inertia::render('index', [
             'profitThisYear' => $formattedProfits['profitThisYear'],
-            // 'profitLastYear' => $formattedProfits['profitLastYear'],
-            // 'qtyThisMonth' => [$monthlyQty['currentMonthQty']],
-            // 'soldThisMonth' => [$monthlyQty['lastMonthQty']], 
+            'profitLastYear' => $formattedProfits['profitLastYear'],
+            'qtyThisMonth' => [$monthlyQty['currentMonthQty']],
+            'soldThisMonth' => [$monthlyQty['lastMonthQty']], 
             // 'profit7Days' => $sold7Days['total_profit'],
             // 'profit30Days' => $sold30Days['total_profit'],
             // 'profit90Days' =>  $sold90Days['total_profit'],
