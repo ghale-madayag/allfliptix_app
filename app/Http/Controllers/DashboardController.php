@@ -189,55 +189,55 @@ class DashboardController extends Controller
         $sold90Days = SoldInventoryTotal::where('period', '90d')->first();
         $sold365DaysTotal = SoldInventoryTotal::where('period', 'like', '365d_part_%')->sum('total_profit');
 
-        // $topSoldTickets = Inventory::selectRaw('
-        //     event_id, 
-        //     DATE_FORMAT(date, "%d") as date, 
-        //     DATE_FORMAT(date, "%b") as month, 
-        //     DATE_FORMAT(date, "%h:%i%p") as time,
-        //     name, 
-        //     SUM(sold) as total_sold
-        // ')
-        // ->whereYear('date', $currentYear)
-        // ->groupBy('event_id', 'date', 'month', 'time', 'name')
-        // ->orderByDesc('total_sold')
-        // ->limit(5) // Get top 5 sold tickets
-        // ->get();
+        $topSoldTickets = Inventory::selectRaw('
+            event_id, 
+            DATE_FORMAT(date, "%d") as date, 
+            DATE_FORMAT(date, "%b") as month, 
+            DATE_FORMAT(date, "%h:%i%p") as time,
+            name, 
+            SUM(sold) as total_sold
+        ')
+        ->whereYear('date', $currentYear)
+        ->groupBy('event_id', 'date', 'month', 'time', 'name')
+        ->orderByDesc('total_sold')
+        ->limit(5) // Get top 5 sold tickets
+        ->get();
 
-        // //compare high sales
-        // $apiToken = env('SKYBOX_API_TOKEN');
-        // $authToken = env('SKYBOX_AUTH_TOKEN');
-        // $startYear = Carbon::now()->startOfYear();
-        // $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
+        //compare high sales
+        $apiToken = env('SKYBOX_API_TOKEN');
+        $authToken = env('SKYBOX_AUTH_TOKEN');
+        $startYear = Carbon::now()->startOfYear();
+        $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
     
-        // $response = Http::withHeaders([
-        //     'X-Api-Token' => $authToken, 
-        //     'X-Application-Token' => $apiToken,
-        //     'Accept' => 'application/json',
-        // ])->get($url);
+        $response = Http::withHeaders([
+            'X-Api-Token' => $authToken, 
+            'X-Application-Token' => $apiToken,
+            'Accept' => 'application/json',
+        ])->get($url);
     
-        // Log::info('Fetching new data from API.');
+        Log::info('Fetching new data from API.');
     
-        // if ($response->failed()) {
-        //     Log::error('Failed to fetch data from API');
-        //     return;
-        // }
+        if ($response->failed()) {
+            Log::error('Failed to fetch data from API');
+            return;
+        }
     
-        // $data = $response->json();
-        // $customerCounts = [];
+        $data = $response->json();
+        $customerCounts = [];
     
-        // foreach ($data['rows'] as $item) {
-        //     $customer = $item['customerDisplayName'] ?? null;
-        //     if ($customer) { // Ignore null values
-        //         $customerCounts[$customer] = ($customerCounts[$customer] ?? 0) + 1;
-        //     }
-        // }
+        foreach ($data['rows'] as $item) {
+            $customer = $item['customerDisplayName'] ?? null;
+            if ($customer) { // Ignore null values
+                $customerCounts[$customer] = ($customerCounts[$customer] ?? 0) + 1;
+            }
+        }
     
-        // // Convert associative array to sorted collection
-        // $ticketCounts = collect($customerCounts)
-        //     ->map(fn($count, $name) => ['customerDisplayName' => $name, 'count' => $count])
-        //     ->sortByDesc('count') // Sort from highest to lowest
-        //     ->values()
-        //     ->all();
+        // Convert associative array to sorted collection
+        $ticketCounts = collect($customerCounts)
+            ->map(fn($count, $name) => ['customerDisplayName' => $name, 'count' => $count])
+            ->sortByDesc('count') // Sort from highest to lowest
+            ->values()
+            ->all();
 
         return Inertia::render('index', [
             'profitThisYear' => $formattedProfits['profitThisYear'],
@@ -248,8 +248,8 @@ class DashboardController extends Controller
             'profit30Days' => $sold30Days['total_profit'],
             'profit90Days' =>  $sold90Days['total_profit'],
             'profit365Days' =>  $sold365DaysTotal,
-            //'topSoldTickets' => $topSoldTickets,
-            // 'ticketCounts' => $ticketCounts
+            'topSoldTickets' => $topSoldTickets,
+            'ticketCounts' => $ticketCounts
         ]);
     }
 
