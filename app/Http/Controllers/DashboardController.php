@@ -122,16 +122,16 @@ class DashboardController extends Controller
             ->all();
 
         return Inertia::render('dashboards/index', [
-            'profitThisYear' => $formattedProfits['profitThisYear'],
-            'profitLastYear' => $formattedProfits['profitLastYear'],
-            'qtyThisMonth' => [$monthlyQty['currentMonthQty']], // Wrap value in array [444]
-            'soldThisMonth' => [$monthlyQty['lastMonthQty']], 
-            'profit7Days' => $sold7Days['total_profit'],
-            'profit30Days' => $sold30Days['total_profit'],
-            'profit90Days' =>  $sold90Days['total_profit'],
-            'profit365Days' =>  $sold365DaysTotal,
-            'topSoldTickets' => $topSoldTickets,
-            'ticketCounts' => $ticketCounts
+            // 'profitThisYear' => $formattedProfits['profitThisYear'],
+            // 'profitLastYear' => $formattedProfits['profitLastYear'],
+            // 'qtyThisMonth' => [$monthlyQty['currentMonthQty']],
+            // 'soldThisMonth' => [$monthlyQty['lastMonthQty']], 
+            // 'profit7Days' => $sold7Days['total_profit'],
+            // 'profit30Days' => $sold30Days['total_profit'],
+            // 'profit90Days' =>  $sold90Days['total_profit'],
+            // 'profit365Days' =>  $sold365DaysTotal,
+            // 'topSoldTickets' => $topSoldTickets,
+            // 'ticketCounts' => $ticketCounts
         ]);
     }
 
