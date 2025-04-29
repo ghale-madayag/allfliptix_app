@@ -24,7 +24,7 @@ export default {
           </div><!-- end card header -->
       </BCol>
     </BRow>
-    <!-- <BRow>
+    <BRow>
       <BCol xxl="3" sm="6">
           <BCard no-body class="card-animate">
             <BCardBody>
@@ -192,7 +192,7 @@ export default {
         </BCard>
       </BRow>
       </BCol>
-    </BRow> -->
+    </BRow>
   </Layout>
 </template>
 
@@ -201,213 +201,213 @@ import { ref, onMounted, computed } from 'vue';
 import getChartColorsArray from "@/common/getChartColorsArray";
 import { CountTo } from "vue3-count-to";
 
-// let props = defineProps({
-//     auth: Object,
-//     profitThisYear: Object,
-//     profitLastYear: Object,
-//     qtyThisMonth: Object,
-//     soldThisMonth: Object,
-//     topSoldTickets: Object,
-//     profit7Days: Number,
-//     profit30Days: Number,
-//     profit90Days: Number,
-//     profit365Days: Number,
-//     ticketCounts: Object
-// })
+let props = defineProps({
+    auth: Object,
+    profitThisYear: Object,
+    profitLastYear: Object,
+    qtyThisMonth: Object,
+    soldThisMonth: Object,
+    topSoldTickets: Object,
+    profit7Days: Number,
+    profit30Days: Number,
+    profit90Days: Number,
+    profit365Days: Number,
+    ticketCounts: Object
+})
 
-// const getGreeting = () => {
-//     const hour = new Date().getHours();
+const getGreeting = () => {
+    const hour = new Date().getHours();
 
-//     if (hour >= 5 && hour < 12) {
-//         return 'Good morning!';
-//     } else if (hour >= 12 && hour < 18) {
-//         return 'Good afternoon!';
-//     } else {
-//         return 'Good evening!';
-//     }
-// };
+    if (hour >= 5 && hour < 12) {
+        return 'Good morning!';
+    } else if (hour >= 12 && hour < 18) {
+        return 'Good afternoon!';
+    } else {
+        return 'Good evening!';
+    }
+};
 
-// const ticketCounts = props.ticketCounts || [];
+const ticketCounts = props.ticketCounts || [];
 
-// const greeting = computed(() => getGreeting());
+const greeting = computed(() => getGreeting());
 
-// const options = ref({
-//   chart: {
-//       height: 500,
-//       type: "line",
-//       zoom: {
-//         enabled: false,
-//       },
-//       toolbar: {
-//         show: false,
-//       },
-//     },
-//     colors: getChartColorsArray('["--vz-success", "--vz-secondary"]'),
-//     dataLabels: {
-//       enabled: false,
-//     },
-//     stroke: {
-//       dashArray: [3, 3],
-//       width: [1, 1],
-//       curve: "straight",
-//     },
-//     xaxis: {
-//         categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-//     },
-//     yaxis: {
-//         labels: {
-//             formatter: function (value) {
-//                 return value + '% ' ; // Add peso sign before the value
-//             }
-//         }
-//     },
-//     fill: {
-//         opacity: [0.25, 0.25,],
-//     },
-//     zoom: {
-//         enabled: false
-//     },
-//     toolbar: {
-//         show: false
-//     },
-//     grid: {
-//       row: {
-//         colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
-//         opacity: 0.2,
-//       },
-//       borderColor: "#f1f1f1",
-//     },
-//     markers: {
-//       style: "inverted",
-//       size: 6,
-//     },
-//     legend: {
-//       position: "top",
-//       horizontalAlign: "right",
-//       floating: true,
-//       offsetY: 0,
-//       offsetX: -5,
-//     },
-//     responsive: [
-//       {
-//         breakpoint: 600,
-//         options: {
-//           chart: {
-//             toolbar: {
-//               show: false,
-//             },
-//           },
-//           legend: {
-//             show: false,
-//           },
-//         },
-//       },
-//     ],
+const options = ref({
+  chart: {
+      height: 500,
+      type: "line",
+      zoom: {
+        enabled: false,
+      },
+      toolbar: {
+        show: false,
+      },
+    },
+    colors: getChartColorsArray('["--vz-success", "--vz-secondary"]'),
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      dashArray: [3, 3],
+      width: [1, 1],
+      curve: "straight",
+    },
+    xaxis: {
+        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    },
+    yaxis: {
+        labels: {
+            formatter: function (value) {
+                return value + '% ' ; // Add peso sign before the value
+            }
+        }
+    },
+    fill: {
+        opacity: [0.25, 0.25,],
+    },
+    zoom: {
+        enabled: false
+    },
+    toolbar: {
+        show: false
+    },
+    grid: {
+      row: {
+        colors: ["transparent", "transparent"], // takes an array which will be repeated on columns
+        opacity: 0.2,
+      },
+      borderColor: "#f1f1f1",
+    },
+    markers: {
+      style: "inverted",
+      size: 6,
+    },
+    legend: {
+      position: "top",
+      horizontalAlign: "right",
+      floating: true,
+      offsetY: 0,
+      offsetX: -5,
+    },
+    responsive: [
+      {
+        breakpoint: 600,
+        options: {
+          chart: {
+            toolbar: {
+              show: false,
+            },
+          },
+          legend: {
+            show: false,
+          },
+        },
+      },
+    ],
   
-// });
+});
 
-// const optionsSales = ref({
-//   chart: {
-//       type: "bar",
-//       height: 410,
-//       toolbar: {
-//         show: false,
-//       },
-//     },
-//     plotOptions: {
-//       bar: {
-//         horizontal: true,
-//         dataLabels: {
-//           position: "top",
-//         },
-//       },
-//     },
-//     dataLabels: {
-//       enabled: true,
-//       offsetX: -6,
-//       style: {
-//         fontSize: "12px",
-//         colors: ["#fff"],
-//       },
-//     },
-//     stroke: {
-//       show: true,
-//       width: 1,
-//       colors: ["#fff"],
-//     },
-//     tooltip: {
-//       shared: true,
-//       intersect: false,
-//     },
-//     xaxis: {
-//       categories: ["Tickets Sold"],
-//     },
-//     fill:{
-//       opacity: [0.7,0.7],
-//     },
-//     colors: getChartColorsArray('["--vz-warning","--vz-success"]'),
+const optionsSales = ref({
+  chart: {
+      type: "bar",
+      height: 410,
+      toolbar: {
+        show: false,
+      },
+    },
+    plotOptions: {
+      bar: {
+        horizontal: true,
+        dataLabels: {
+          position: "top",
+        },
+      },
+    },
+    dataLabels: {
+      enabled: true,
+      offsetX: -6,
+      style: {
+        fontSize: "12px",
+        colors: ["#fff"],
+      },
+    },
+    stroke: {
+      show: true,
+      width: 1,
+      colors: ["#fff"],
+    },
+    tooltip: {
+      shared: true,
+      intersect: false,
+    },
+    xaxis: {
+      categories: ["Tickets Sold"],
+    },
+    fill:{
+      opacity: [0.7,0.7],
+    },
+    colors: getChartColorsArray('["--vz-warning","--vz-success"]'),
   
-// });
+});
 
-// const currentYear = new Date().getFullYear();
-// const lastYear = currentYear - 1;
+const currentYear = new Date().getFullYear();
+const lastYear = currentYear - 1;
 
-// const series = ref([
-//     {
-//         name: currentYear,
-//         type: 'area',
-//         data: props.profitThisYear,
-//     },
-//     {
-//         name: lastYear,
-//         type: 'area',
-//         data: props.profitLastYear
-//     }
-//   ]
-// );
+const series = ref([
+    {
+        name: currentYear,
+        type: 'area',
+        data: props.profitThisYear,
+    },
+    {
+        name: lastYear,
+        type: 'area',
+        data: props.profitLastYear
+    }
+  ]
+);
 
-// const seriesSales = ref([
-//     {
-//         name: "Last Month",
-//         type: 'bar',
-//         data: props.soldThisMonth
-//     },
-//     {
-//         name: "Current Month",
-//         type: 'bar',
-//         data: props.qtyThisMonth
-//     }
-//   ]
-// );
+const seriesSales = ref([
+    {
+        name: "Last Month",
+        type: 'bar',
+        data: props.soldThisMonth
+    },
+    {
+        name: "Current Month",
+        type: 'bar',
+        data: props.qtyThisMonth
+    }
+  ]
+);
 
-// const pieSeries = computed(() => ticketCounts.map(item => item.count));
+const pieSeries = computed(() => ticketCounts.map(item => item.count));
 
-// const pieOptions = ref({
-//   chart: {
-//     type: 'donut',
-//   },                                      
-//   labels: ticketCounts.map(item => item.customerDisplayName),
-//   dataLabels: {
-//     enabled: true // Hide labels on the chart
-//   },
-//   legend: {
-//     show: true, // Hide legend,
-//     position: 'right',
-//     labels: {
-//       useSeriesColors: true
-//     },
-//     formatter: function(seriesName, opts) {
-//       return `${seriesName}: ${opts.w.globals.series[opts.seriesIndex]}`; // Show name and value
-//     }
-//   },
-//   plotOptions: {
-//     pie: {
-//       expandOnClick: true, // Prevent slices from expanding when clicked
-//       donut: {
-//         size: '0%' // Adjust the fill scale (default is 65%)
-//       }
-//     }
-//   }
-// });
+const pieOptions = ref({
+  chart: {
+    type: 'donut',
+  },                                      
+  labels: ticketCounts.map(item => item.customerDisplayName),
+  dataLabels: {
+    enabled: true // Hide labels on the chart
+  },
+  legend: {
+    show: true, // Hide legend,
+    position: 'right',
+    labels: {
+      useSeriesColors: true
+    },
+    formatter: function(seriesName, opts) {
+      return `${seriesName}: ${opts.w.globals.series[opts.seriesIndex]}`; // Show name and value
+    }
+  },
+  plotOptions: {
+    pie: {
+      expandOnClick: true, // Prevent slices from expanding when clicked
+      donut: {
+        size: '0%' // Adjust the fill scale (default is 65%)
+      }
+    }
+  }
+});
 
 </script>
