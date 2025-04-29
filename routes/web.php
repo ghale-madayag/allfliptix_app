@@ -59,7 +59,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',
     });                                                                             
 
     Route::controller(DashboardController::class)->group(function () {
-        Route::get('/', 'index');
+        //Route::get('/', 'index');
+        Route::get('/', fn () => 'Test root');
+
     }); 
 
     Route::controller(UsersController::class)->group(function () {
