@@ -184,10 +184,10 @@ class DashboardController extends Controller
         ];
 
 
-        // $sold7Days = SoldInventoryTotal::where('period', '7d')->first();
-        // $sold30Days = SoldInventoryTotal::where('period', '30d')->first();
-        // $sold90Days = SoldInventoryTotal::where('period', '90d')->first();
-        // $sold365DaysTotal = SoldInventoryTotal::where('period', 'like', '365d_part_%')->sum('total_profit');
+        $sold7Days = SoldInventoryTotal::where('period', '7d')->first();
+        $sold30Days = SoldInventoryTotal::where('period', '30d')->first();
+        $sold90Days = SoldInventoryTotal::where('period', '90d')->first();
+        $sold365DaysTotal = SoldInventoryTotal::where('period', 'like', '365d_part_%')->sum('total_profit');
 
         // $topSoldTickets = Inventory::selectRaw('
         //     event_id, 
@@ -244,11 +244,11 @@ class DashboardController extends Controller
             'profitLastYear' => $formattedProfits['profitLastYear'],
             'qtyThisMonth' => [$monthlyQty['currentMonthQty']],
             'soldThisMonth' => [$monthlyQty['lastMonthQty']], 
-            // 'profit7Days' => $sold7Days['total_profit'],
-            // 'profit30Days' => $sold30Days['total_profit'],
-            // 'profit90Days' =>  $sold90Days['total_profit'],
-            // 'profit365Days' =>  $sold365DaysTotal,
-            // 'topSoldTickets' => $topSoldTickets,
+            'profit7Days' => $sold7Days['total_profit'],
+            'profit30Days' => $sold30Days['total_profit'],
+            'profit90Days' =>  $sold90Days['total_profit'],
+            'profit365Days' =>  $sold365DaysTotal,
+            //'topSoldTickets' => $topSoldTickets,
             // 'ticketCounts' => $ticketCounts
         ]);
     }
