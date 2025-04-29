@@ -121,7 +121,6 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-        
         return Inertia::render('dashboards/index', [
             'profitThisYear' => $formattedProfits['profitThisYear'],
             'profitLastYear' => $formattedProfits['profitLastYear'],
