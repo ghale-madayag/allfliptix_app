@@ -145,9 +145,9 @@ class DashboardController extends Controller
         ->orderBy('period')
         ->pluck('total_profit_margin', 'period');
 
-        $profitLastYear = SoldInventoryTotal::where('period', 'like', "$lastYear-%")
-        ->orderBy('period')
-        ->pluck('total_profit_margin', 'period');
+        // $profitLastYear = SoldInventoryTotal::where('period', 'like', "$lastYear-%")
+        // ->orderBy('period')
+        // ->pluck('total_profit_margin', 'period');
 
         // Initialize empty arrays for 12 months
         $formattedProfits = [
@@ -155,101 +155,101 @@ class DashboardController extends Controller
         'profitLastYear' => array_fill(0, 12, 0),
         ];
 
-        // Fill in profits based on period (YYYY-MM format)
-        foreach ($profitThisYear as $period => $profit) {
-            $monthIndex = intval(substr($period, 5, 2)) - 1; // Extract month from "YYYY-MM"
-            $formattedProfits['profitThisYear'][$monthIndex] = $profit;
-        }
+        // // Fill in profits based on period (YYYY-MM format)
+        // foreach ($profitThisYear as $period => $profit) {
+        //     $monthIndex = intval(substr($period, 5, 2)) - 1; // Extract month from "YYYY-MM"
+        //     $formattedProfits['profitThisYear'][$monthIndex] = $profit;
+        // }
 
-        foreach ($profitLastYear as $period => $profit) {
-            $monthIndex = intval(substr($period, 5, 2)) - 1; // Extract month from "YYYY-MM"
-            $formattedProfits['profitLastYear'][$monthIndex] = $profit;
-        }
+        // foreach ($profitLastYear as $period => $profit) {
+        //     $monthIndex = intval(substr($period, 5, 2)) - 1; // Extract month from "YYYY-MM"
+        //     $formattedProfits['profitLastYear'][$monthIndex] = $profit;
+        // }
 
-        $currentMonth = now()->format('Y-m'); // Format: YYYY-MM (e.g., 2025-03)
-        $lastMonth = now()->subMonth()->format('Y-m'); // Last month in YYYY-MM format
+        // $currentMonth = now()->format('Y-m'); // Format: YYYY-MM (e.g., 2025-03)
+        // $lastMonth = now()->subMonth()->format('Y-m'); // Last month in YYYY-MM format
         
-        // Get total quantity for the current month
-        $currentMonthQty = SoldInventoryTotal::where('period', $currentMonth)
-            ->sum('total_qty');
+        // // Get total quantity for the current month
+        // $currentMonthQty = SoldInventoryTotal::where('period', $currentMonth)
+        //     ->sum('total_qty');
         
-        // Get total quantity for the last month
-        $lastMonthQty = SoldInventoryTotal::where('period', $lastMonth)
-            ->sum('total_qty');
+        // // Get total quantity for the last month
+        // $lastMonthQty = SoldInventoryTotal::where('period', $lastMonth)
+        //     ->sum('total_qty');
         
-        // Output result
-        $monthlyQty = [
-            'currentMonthQty' => $currentMonthQty,
-            'lastMonthQty' => $lastMonthQty,
-        ];
+        // // Output result
+        // $monthlyQty = [
+        //     'currentMonthQty' => $currentMonthQty,
+        //     'lastMonthQty' => $lastMonthQty,
+        // ];
 
 
-        $sold7Days = SoldInventoryTotal::where('period', '7d')->first();
-        $sold30Days = SoldInventoryTotal::where('period', '30d')->first();
-        $sold90Days = SoldInventoryTotal::where('period', '90d')->first();
-        $sold365DaysTotal = SoldInventoryTotal::where('period', 'like', '365d_part_%')->sum('total_profit');
+        // $sold7Days = SoldInventoryTotal::where('period', '7d')->first();
+        // $sold30Days = SoldInventoryTotal::where('period', '30d')->first();
+        // $sold90Days = SoldInventoryTotal::where('period', '90d')->first();
+        // $sold365DaysTotal = SoldInventoryTotal::where('period', 'like', '365d_part_%')->sum('total_profit');
 
-        $topSoldTickets = Inventory::selectRaw('
-            event_id, 
-            DATE_FORMAT(date, "%d") as date, 
-            DATE_FORMAT(date, "%b") as month, 
-            DATE_FORMAT(date, "%h:%i%p") as time,
-            name, 
-            SUM(sold) as total_sold
-        ')
-        ->whereYear('date', $currentYear)
-        ->groupBy('event_id', 'date', 'month', 'time', 'name')
-        ->orderByDesc('total_sold')
-        ->limit(5) // Get top 5 sold tickets
-        ->get();
+        // $topSoldTickets = Inventory::selectRaw('
+        //     event_id, 
+        //     DATE_FORMAT(date, "%d") as date, 
+        //     DATE_FORMAT(date, "%b") as month, 
+        //     DATE_FORMAT(date, "%h:%i%p") as time,
+        //     name, 
+        //     SUM(sold) as total_sold
+        // ')
+        // ->whereYear('date', $currentYear)
+        // ->groupBy('event_id', 'date', 'month', 'time', 'name')
+        // ->orderByDesc('total_sold')
+        // ->limit(5) // Get top 5 sold tickets
+        // ->get();
 
-        //compare high sales
-        $apiToken = env('SKYBOX_API_TOKEN');
-        $authToken = env('SKYBOX_AUTH_TOKEN');
-        $startYear = Carbon::now()->startOfYear();
-        $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
+        // //compare high sales
+        // $apiToken = env('SKYBOX_API_TOKEN');
+        // $authToken = env('SKYBOX_AUTH_TOKEN');
+        // $startYear = Carbon::now()->startOfYear();
+        // $url = 'https://skybox.vividseats.com/services/inventory/sold?invoiceDateFrom=' . $startYear->toDateString();
     
-        $response = Http::withHeaders([
-            'X-Api-Token' => $authToken, 
-            'X-Application-Token' => $apiToken,
-            'Accept' => 'application/json',
-        ])->get($url);
+        // $response = Http::withHeaders([
+        //     'X-Api-Token' => $authToken, 
+        //     'X-Application-Token' => $apiToken,
+        //     'Accept' => 'application/json',
+        // ])->get($url);
     
-        Log::info('Fetching new data from API.');
+        // Log::info('Fetching new data from API.');
     
-        if ($response->failed()) {
-            Log::error('Failed to fetch data from API');
-            return;
-        }
+        // if ($response->failed()) {
+        //     Log::error('Failed to fetch data from API');
+        //     return;
+        // }
     
-        $data = $response->json();
-        $customerCounts = [];
+        // $data = $response->json();
+        // $customerCounts = [];
     
-        foreach ($data['rows'] as $item) {
-            $customer = $item['customerDisplayName'] ?? null;
-            if ($customer) { // Ignore null values
-                $customerCounts[$customer] = ($customerCounts[$customer] ?? 0) + 1;
-            }
-        }
+        // foreach ($data['rows'] as $item) {
+        //     $customer = $item['customerDisplayName'] ?? null;
+        //     if ($customer) { // Ignore null values
+        //         $customerCounts[$customer] = ($customerCounts[$customer] ?? 0) + 1;
+        //     }
+        // }
     
-        // Convert associative array to sorted collection
-        $ticketCounts = collect($customerCounts)
-            ->map(fn($count, $name) => ['customerDisplayName' => $name, 'count' => $count])
-            ->sortByDesc('count') // Sort from highest to lowest
-            ->values()
-            ->all();
+        // // Convert associative array to sorted collection
+        // $ticketCounts = collect($customerCounts)
+        //     ->map(fn($count, $name) => ['customerDisplayName' => $name, 'count' => $count])
+        //     ->sortByDesc('count') // Sort from highest to lowest
+        //     ->values()
+        //     ->all();
 
         return Inertia::render('index', [
             'profitThisYear' => $formattedProfits['profitThisYear'],
-            'profitLastYear' => $formattedProfits['profitLastYear'],
-            'qtyThisMonth' => [$monthlyQty['currentMonthQty']],
-            'soldThisMonth' => [$monthlyQty['lastMonthQty']], 
-            'profit7Days' => $sold7Days['total_profit'],
-            'profit30Days' => $sold30Days['total_profit'],
-            'profit90Days' =>  $sold90Days['total_profit'],
-            'profit365Days' =>  $sold365DaysTotal,
-            'topSoldTickets' => $topSoldTickets,
-            'ticketCounts' => $ticketCounts
+            // 'profitLastYear' => $formattedProfits['profitLastYear'],
+            // 'qtyThisMonth' => [$monthlyQty['currentMonthQty']],
+            // 'soldThisMonth' => [$monthlyQty['lastMonthQty']], 
+            // 'profit7Days' => $sold7Days['total_profit'],
+            // 'profit30Days' => $sold30Days['total_profit'],
+            // 'profit90Days' =>  $sold90Days['total_profit'],
+            // 'profit365Days' =>  $sold365DaysTotal,
+            // 'topSoldTickets' => $topSoldTickets,
+            // 'ticketCounts' => $ticketCounts
         ]);
     }
 
