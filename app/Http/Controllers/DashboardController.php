@@ -121,7 +121,7 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('dashboards/index', [
+        return Inertia::render('index', [
             // 'profitThisYear' => $formattedProfits['profitThisYear'],
             // 'profitLastYear' => $formattedProfits['profitLastYear'],
             // 'qtyThisMonth' => [$monthlyQty['currentMonthQty']],
