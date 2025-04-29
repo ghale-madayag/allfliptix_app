@@ -197,9 +197,9 @@ export default {
 </template>
 
 <script setup>
-// import { ref, onMounted, computed } from 'vue';
-// import getChartColorsArray from "@/common/getChartColorsArray";
-// import { CountTo } from "vue3-count-to";
+import { ref, onMounted, computed } from 'vue';
+import getChartColorsArray from "@/common/getChartColorsArray";
+import { CountTo } from "vue3-count-to";
 
 // let props = defineProps({
 //     auth: Object,
